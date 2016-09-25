@@ -1,0 +1,51 @@
+extends layout
+
+block pre
+  - var microdata_type = 'Article';
+
+block prepend title
+  | #{ (page.metadata.title_en || page.title) + " - "}
+
+block meta
+  meta(itemprop='name', content=((page.metadata.title_en || page.title) + ' - ' + (page.metadata.desc_en || page.metadata.desc)))
+  meta(itemprop='description', content=page.metadata.desc_en || page.metadata.desc)
+  meta(name='description', content=page.metadata.desc_en || page.metadata.desc)
+  meta(itemprop='image', content=locals.url + page.url + page.metadata.thumb)
+  meta(itemprop='dateCreated', content=page.date.toISOString())
+  meta(itemprop='datePublished', content=page.date.toISOString())
+
+
+block body
+  body.article
+    include nav.jade
+
+    - var encodedURI = encodeURIComponent(locals.url + page.url);
+    - var encodedThumbURI = encodeURIComponent(locals.url + page.url + page.metadata.thumb);
+    - var encodedTitlePL = encodeURIComponent(page.metadata.title_pl || page.metadata.title);
+    - var encodedTitleEN = encodeURIComponent(page.metadata.title_en || page.metadata.title);
+    - var encodedDescPL = encodeURIComponent(page.metadata.desc_pl || page.metadata.desc);
+    - var encodedDescEN = encodeURIComponent(page.metadata.desc_en || page.metadata.desc);
+    article!= page.html /* typogr(page.html).typogrify() */
+      h2(lang='en') Share:
+      h2(lang='pl') Podaj dalej:
+
+      #fb-root
+      script.
+        (function(d, s, id) {
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) return;
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/pl_PL/sdk.js#xfbml=1&version=v2.5";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+      .fb-share-button(data-layout="box_count",style="top:-8px")
+
+      script(src="https://apis.google.com/js/platform.js",async,defer)
+      .g-plus(data-action="share",data-annotation="vertical-bubble",data-height="60")
+
+      a.twitter-share-button(href="https://twitter.com/share",data-via="mafikpl",data-size="large") Tweet
+      script !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+
+      script(src="//www.redditstatic.com/button/button1.js")
+
+    script(src='/i18n.js')

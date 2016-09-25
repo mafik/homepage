@@ -2,8 +2,8 @@
   "locals": {
     "url": "https://mrogalski.eu",
     "name": "Marek Rogalski",
-    "desc_en": "Hacking, AI, Android, HTML5, RPG",
-    "desc_pl": "Hakowanie, SI, Android, HTML5, RPG"
+    "desc_en": "Security, Artificial Intelligence, Android, HTML5, RPG",
+    "desc_pl": "Zabezpieczenia, Sztuczna Inteligencja, Android, HTML5, RPG"
   },
   "plugins": [
     "./plugins/articles.coffee"

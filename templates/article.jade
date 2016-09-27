@@ -25,7 +25,7 @@ block body
     - var encodedTitleEN = encodeURIComponent(page.metadata.title_en || page.metadata.title);
     - var encodedDescPL = encodeURIComponent(page.metadata.desc_pl || page.metadata.desc);
     - var encodedDescEN = encodeURIComponent(page.metadata.desc_en || page.metadata.desc);
-    article!= page.html /* typogr(page.html).typogrify() */
+    article!= page.html
       h2(lang='en') Share:
       h2(lang='pl') Podaj dalej:
 

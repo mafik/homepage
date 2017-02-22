@@ -15,19 +15,19 @@ whenever I get on a new workstation.</p>
 
 <p>Gnubby key for remote access:</p> 
 
-```
+```bash
 echo ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKv2Gl1X0Zw+8/gKHk1hv9pFD/kBFiKpjbVB4gllZM2rI0s8TGc7b9ylMRFTlB+j/6iR7XeQinDnzbI/Jnpz4to= publickey > ~/.ssh/authorized_keys
 ```
 
 <h2>Debian-derivatives</h2>
 
-```
+```bash
 sudo apt-get install i3 emacs htop arandr git dunst gnome-font-viewer thunar pv steam qemu pavucontrol npm mplayer blueman xbacklight transmission evince ttf-bitstream-vera meld
 ```
 
 <h2>Emacs</h2>
 
-```
+```bash
 rm -f ~/.emacs
 mkdir -p ~/.emacs.d/
 cat << 'EOF' > ~/.emacs.d/init.el
@@ -73,7 +73,7 @@ EOF
 
 ## Git
 
-```
+```bash
 cat << 'EOF' > ~/.gitconfig
 [user]
 	name = Marek Rogalski
@@ -83,7 +83,7 @@ EOF
 
 ## Bash
 
-```
+```bash
 mkdir ~/bin
 
 cat << 'EOF' > ~/.profile
@@ -291,7 +291,7 @@ EOF
 
 <h2>Desktop environment (X11, i3, dunst)</h2>
 
-```
+```bash
 cat << 'EOF' > ~/.Xmodmap
 keycode 66 = Control_L
 clear Lock 

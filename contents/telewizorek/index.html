@@ -1,14 +1,67 @@
 <!doctype html>
-<title>Telewizorek</title>
+<head><title>Telewizorek</title></head>
 <script src="https://www.gstatic.com/firebasejs/3.6.10/firebase.js"></script>
 <script>
-  // Initialize Firebase
-  var config = {
-    apiKey: "AIzaSyDXFQFwoH-228dKzH88MlZiDlXiZMX3NVI",
-    authDomain: "homepage-43026.firebaseapp.com",
-    databaseURL: "https://homepage-43026.firebaseio.com",
-    storageBucket: "homepage-43026.appspot.com",
-    messagingSenderId: "51655992730"
-  };
-  firebase.initializeApp(config);
+ var config = {
+     apiKey: "AIzaSyDXFQFwoH-228dKzH88MlZiDlXiZMX3NVI",
+     authDomain: "homepage-43026.firebaseapp.com",
+     databaseURL: "https://homepage-43026.firebaseio.com",
+     storageBucket: "homepage-43026.appspot.com",
+     messagingSenderId: "51655992730"
+ };
+ firebase.initializeApp(config);
+
+ firebase.auth().onAuthStateChanged(function(user) {
+     if (user) {
+	 firebase.database().ref("videos").on("value", function(snapshot) {
+	     var videos = snapshot.val();
+	     for (var key in videos) {
+		 var video = videos[key];
+		 var elem = document.getElementById(key);
+		 if (elem) {
+		     // do nothing
+		 } else {
+		     elem = document.createElement('div');
+		     elem.id = key;
+		     console.log(video);
+		     var title = document.createElement('div');
+		     title.innerText = video.show + ' Season ' + video.season + ' Episode ' + video.episode;
+		     if (video.title) {
+			 title.innerText += " : " + video.title;
+		     }
+		     elem.appendChild(title);
+		     
+		     var player = document.createElement('video');
+		     player.preload = 'none';
+		     player.controls = 'controls';
+		     player.crossOrigin = 'anonymous';
+		     (function(player) {
+			 firebase.storage().ref(video.mp4).getDownloadURL().then(function(url) {
+			     player.src = url;
+			 });
+			 firebase.storage().ref(video.thumb_480x270).getDownloadURL().then(function(url) {
+			     player.poster = url;
+			 });
+			 if (video.vtt) {
+			     var vtt = document.createElement('track');
+			     vtt.kind = 'subtitles';
+			     vtt.label = 'English';
+			     vtt.srclang = 'en';
+			     vtt.crossOrigin = 'use-credentials';
+			     firebase.storage().ref(video.vtt).getDownloadURL().then(function(url) {
+				 vtt.src = url;
+			     });
+			     player.appendChild(vtt);
+			 }
+		     })(player);
+		     elem.appendChild(player);
+		     document.body.appendChild(elem);
+		 }
+	     }
+	 });
+     } else {
+	 var provider = new firebase.auth.GoogleAuthProvider();
+	 firebase.auth().signInWithRedirect(provider);
+     }
+ });
 </script>

@@ -34,7 +34,7 @@ for contents_dir_path, dirnames, filenames in os.walk('contents'):
                     (page if key in page_properties else page['metadata'])[key] = value
                 md_string = ''.join(lines[front_matter_end+1:])
                 page['filename'] = os.path.splitext(filename)[0] + '.html'
-                page['html'] = markdown.markdown(md_string, extensions=['markdown.extensions.smarty', 'markdown.extensions.sane_lists'], output_format='html5')
+                page['html'] = markdown.markdown(md_string, extensions=['markdown.extensions.smarty', 'markdown.extensions.sane_lists', 'markdown.extensions.fenced_code', 'markdown.extensions.codehilite'], output_format='html5')
             elif is_json:
                 page = json.loads(open(contents_path).read())
             if 'date' in page:
@@ -79,12 +79,3 @@ print("Waiting for renderers to finish...")
     
 for renderer in renderers:
     renderer.wait()
-
-''' TODO:
-,
-  "markdown": {
-    "smartLists": true,
-    "smartypants": true
-  }
-}
-'''

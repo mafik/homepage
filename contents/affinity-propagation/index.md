@@ -4,7 +4,7 @@ title_pl: Affinity Propagation
 title_en: Affinity Propagation
 desc_pl: Jak grupować dane, o których nic nie wiemy
 desc_en: How to group stuff without any prior knowledge
-template: article.jade
+template: article.pug
 thumb: thumb.jpg
 ---
 

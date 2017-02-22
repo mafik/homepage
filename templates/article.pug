@@ -10,17 +10,17 @@ block meta
   meta(itemprop='name', content=((page.metadata.title_en || page.title) + ' - ' + (page.metadata.desc_en || page.metadata.desc)))
   meta(itemprop='description', content=page.metadata.desc_en || page.metadata.desc)
   meta(name='description', content=page.metadata.desc_en || page.metadata.desc)
-  meta(itemprop='image', content=locals.url + page.url + page.metadata.thumb)
-  meta(itemprop='dateCreated', content=page.date.toISOString())
-  meta(itemprop='datePublished', content=page.date.toISOString())
+  meta(itemprop='image', content=config.url + page.url + page.metadata.thumb)
+  meta(itemprop='dateCreated', content=page.date)
+  meta(itemprop='datePublished', content=page.date)
 
 
 block body
   body.article
-    include nav.jade
+    include nav.pug
 
-    - var encodedURI = encodeURIComponent(locals.url + page.url);
-    - var encodedThumbURI = encodeURIComponent(locals.url + page.url + page.metadata.thumb);
+    - var encodedURI = encodeURIComponent(config.url + page.url);
+    - var encodedThumbURI = encodeURIComponent(config.url + page.url + page.metadata.thumb);
     - var encodedTitlePL = encodeURIComponent(page.metadata.title_pl || page.metadata.title);
     - var encodedTitleEN = encodeURIComponent(page.metadata.title_en || page.metadata.title);
     - var encodedDescPL = encodeURIComponent(page.metadata.desc_pl || page.metadata.desc);

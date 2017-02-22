@@ -1,7 +1,7 @@
 ---
 title: Clearly
 date: 2013-11-24
-template: article.jade
+template: article.pug
 desc_pl: Wreszcie, przeglądarkowy edytor dla hakerów
 desc_en: Finally, in-browser editor for hackers
 thumb: thumb.jpg

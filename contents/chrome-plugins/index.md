@@ -2,7 +2,7 @@
 date: 2013-09-16
 title_en: Chrome Plugins
 title_pl: Wtyczki do Chrome
-template: article.jade
+template: article.pug
 desc_pl: Kilka najlepszych wtyczek do Chrome
 desc_en: Some of the best  Chrome plugins
 thumb: thumb.jpg

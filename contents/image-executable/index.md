@@ -3,7 +3,7 @@ title_pl: Obrazy Wykonywalne
 title_en: Image Executable
 desc_pl: Czemu zwyczajnie nie zaczniemy zapisywać obrazów jako plików wykonywalnych?
 desc_en: Why don't we just save images and videos as executables?
-template: article.jade
+template: article.pug
 thumb: page.png
 date: 2014-04-19
 ---

@@ -1,7 +1,7 @@
 ---
 title: Dotfiles
 desc_en: Scripts, dotfiles and setup instructions of a pragmatic hacker.
-template: article.jade
+template: article.pug
 thumb: hack.png
 date: 2016-09-26
 ---

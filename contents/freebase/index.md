@@ -5,7 +5,7 @@ date: 2013-07-29
 desc_pl: Kilka prezentacji wprowadzających do największej, semantycznej bazy danych na świecie.
 desc_en: A few presentations with introduction to the biggest semantical database in the world.
 thumb: thumb.png
-template: article.jade
+template: article.pug
 ---
 
 <h1 lang=pl>Wprowadzenie do Freebase</h1>

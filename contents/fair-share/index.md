@@ -3,7 +3,7 @@ title_pl: Kalkulator podziału czynszu
 title_en: Rent share calculator
 desc_pl: Sprawiedliwie podziel czynsz za wynajem pokoi o różnych rozmiarach.
 desc_en: Split rent for several different rooms in a fair way.
-template: article.jade
+template: article.pug
 thumb: rooms.png
 date: 2016-08-31
 ---

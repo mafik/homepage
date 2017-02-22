@@ -4,7 +4,7 @@ title_pl: Dvorak Programisty w Konsoli Linuksa
 title_en: Programmer Dvorak in Linux Console
 desc_pl: Obsługa "dvoraka programisty" w konsoli linuxa
 desc_en: Fix for linux users using programmer dvorak in system console
-template: article.jade
+template: article.pug
 thumb: thumb.png
 ---
 

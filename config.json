@@ -1,23 +1,6 @@
 {
-  "locals": {
     "url": "https://mrogalski.eu",
     "name": "Marek Rogalski",
     "desc_en": "Security, Artificial Intelligence, Android, HTML5, RPG",
     "desc_pl": "Zabezpieczenia, Sztuczna Inteligencja, Android, HTML5, RPG"
-  },
-  "plugins": [
-    "./plugins/articles.coffee"
-  ],
-  "require": {
-    "moment": "moment",
-    "_": "underscore",
-    "typogr": "typogr"
-  },
-  "jade": {
-    "pretty": true
-  },
-  "markdown": {
-    "smartLists": true,
-    "smartypants": true
-  }
 }

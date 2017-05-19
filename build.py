@@ -19,7 +19,7 @@ for contents_dir_path, dirnames, filenames in os.walk('contents'):
     os.mkdir('build/' + path)
     for filename in filenames:
         contents_path = 'contents/' + format_path(path, filename)
-        is_md = filename.endswith('.md')
+        is_md = filename.endswith('.md') and not filename.startswith('.')
         is_json = filename.endswith('.json')
         if is_md or is_json:
             if is_md:
@@ -53,6 +53,7 @@ for contents_dir_path, dirnames, filenames in os.walk('contents'):
 options = dict()
 options['config'] = json.loads(open('config.json').read())
 options['articles'] = [p for p in pages if p['template'].startswith('article')]
+
 options['articles'].sort(key=lambda p: p['date'], reverse=True)
 
 print("Starting renderers...")

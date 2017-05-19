@@ -120,6 +120,14 @@ input, textarea {
   border: 2px solid #ccc;
 }
 
+em {
+    font-weight: 400;
+}
+
+strong {
+    font-weight: 500;
+}
+
 pre {
   font-family: "Fira Mono";
   overflow: auto;

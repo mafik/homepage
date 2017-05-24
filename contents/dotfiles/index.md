@@ -11,14 +11,6 @@ date: 2016-09-26
 <p>These are just some of my scripts & dotfiles that I run
 whenever I get on a new workstation.</p>
 
-<h2>SSH</h2>
-
-<p>Gnubby key for remote access:</p> 
-
-```bash
-echo ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBKv2Gl1X0Zw+8/gKHk1hv9pFD/kBFiKpjbVB4gllZM2rI0s8TGc7b9ylMRFTlB+j/6iR7XeQinDnzbI/Jnpz4to= publickey > ~/.ssh/authorized_keys
-```
-
 <h2>Debian-derivatives</h2>
 
 ```bash
@@ -31,13 +23,65 @@ sudo apt-get install i3 emacs htop arandr git dunst gnome-font-viewer thunar pv 
 rm -f ~/.emacs
 mkdir -p ~/.emacs.d/
 cat << 'EOF' > ~/.emacs.d/init.el
+(setenv "GPG_AGENT_INFO" nil)
+
 (package-initialize)
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+
+(add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (ido-mode 1)
+
+;; Clean dired
+(require 'dired-x)
+(setq-default dired-omit-files-p t) ; Buffer-local variable
+(setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+
+;; Clean backups
+(defconst emacs-tmp-dir (format "%s%s%s/" temporary-file-directory "emacs" (user-uid)))
+(setq backup-directory-alist `((".*" . ,emacs-tmp-dir)))
+(setq auto-save-file-name-transforms `((".*" ,emacs-tmp-dir t)))
+(setq auto-save-list-file-prefix emacs-tmp-dir)
+	  
+;; HTML editing
+(require 'web-mode)
+(require 'sws-mode)
+(require 'jade-mode)
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.styl\\'" . sws-mode))
+
+;; Transparent encryption
+(require 'epa-file)
+(epa-file-enable)
+
+;; Programming
+(defun coding-setup ()
+  (linum-mode 1)
+  (show-paren-mode 1))
+  
+(add-hook 'go-mode-hook 'coding-setup)
+(add-hook 'c-mode-hook 'coding-setup)
+(add-hook 'python-mode-hook 'coding-setup)
+(add-hook 'rust-mode-hook 'coding-setup)
+
+;; Rust
+(setq rust-rustfmt-bin "~/.cargo/bin/rustfmt")
+(setq rust-format-on-save t)
+(setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH
+(setq racer-rust-src-path "/home/mrogalski/rust/src") ;; Rust source code PATH
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+(add-hook 'rust-mode-hook
+          (lambda ()
+            (racer-mode)
+	        (eldoc-mode)
+            (flycheck-mode)
+            (company-mode)
+            (local-set-key (kbd "C-c h") #'racer-describe)))
+
+
 
 ;; Google stuff
 (require 'google)
@@ -59,15 +103,19 @@ cat << 'EOF' > ~/.emacs.d/init.el
 (global-set-key [f10] 'google-show-matching-tags)
 (grok-init)
 
-(set-default-font "Bitstream Vera Sans Mono 8")
-
 (custom-set-variables
  '(inhibit-default-init nil)
  '(inhibit-startup-screen t)
  '(initial-major-mode (quote org-mode))
  '(initial-scratch-message "* ")
  '(server-mode t))
-(custom-set-faces)
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight semi-light :height 203 :width normal :foundry "CYEL" :family "Iosevka")))))
 EOF
 ```
 
@@ -245,9 +293,7 @@ if ! shopt -oq posix; then
 fi
 
 # custom stuff
-export ANDROID_SDK_HOME=${HOME}/android-sdk-linux
-export ANDROID_NDK_HOME=${HOME}/android-ndk-r10e
-export PATH=${PATH}:$HOME/bin:${ANDROID_SDK_HOME}/tools:${ANDROID_SDK_HOME}/platform-tools:${ANDROID_NDK_HOME}
+export PATH=${PATH}:$HOME/bin
 
 function prompt_command {
   TERMWIDTH=${COLUMNS}

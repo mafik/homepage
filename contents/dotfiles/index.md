@@ -27,13 +27,23 @@ cat << 'EOF' > ~/.emacs.d/init.el
 
 (package-initialize)
 (require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (ido-mode 1)
+
+(setq indent-tabs-mode nil)
+(setq inhibit-default-init nil)
+(setq inhibit-startup-screen t)
+(setq initial-major-mode (quote org-mode))
+(setq initial-scratch-message "* ")
+(setq server-mode t)
+(setq tab-width 2)
+
+(global-set-key "\M-g" 'goto-line)
 
 ;; Clean dired
 (require 'dired-x)
@@ -45,7 +55,7 @@ cat << 'EOF' > ~/.emacs.d/init.el
 (setq backup-directory-alist `((".*" . ,emacs-tmp-dir)))
 (setq auto-save-file-name-transforms `((".*" ,emacs-tmp-dir t)))
 (setq auto-save-list-file-prefix emacs-tmp-dir)
-	  
+
 ;; HTML editing
 (require 'web-mode)
 (require 'sws-mode)
@@ -61,25 +71,60 @@ cat << 'EOF' > ~/.emacs.d/init.el
 (defun coding-setup ()
   (linum-mode 1)
   (show-paren-mode 1))
-  
+
 (add-hook 'go-mode-hook 'coding-setup)
 (add-hook 'c-mode-hook 'coding-setup)
 (add-hook 'python-mode-hook 'coding-setup)
 (add-hook 'rust-mode-hook 'coding-setup)
 
+;; Go
+
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-env "GOPATH"))
+
+(defun my-go-mode-hook ()
+  (require 'go-guru)
+  (require 'go-autocomplete)
+  (add-hook 'before-save-hook 'gofmt-before-save) ; gofmt before every save
+  (setq gofmt-command "goimports")                ; gofmt uses invokes goimports
+  (if (not (string-match "go" compile-command))   ; set compile command default
+      (set (make-local-variable 'compile-command)
+           "go build -v && go test -v && go vet"))
+
+  ;; guru settings
+  (go-guru-hl-identifier-mode)                    ; highlight identifiers
+
+  ;; Key bindings specific to go-mode
+  (local-set-key (kbd "M-.") 'godef-jump)         ; Go to definition
+  (local-set-key (kbd "M-,") 'pop-tag-mark)       ; Return from whence you came
+  (local-set-key (kbd "M-p") 'compile)            ; Invoke compiler
+  (local-set-key (kbd "M-P") 'recompile)          ; Redo most recent compile cmd
+  (local-set-key (kbd "M-]") 'next-error)         ; Go to next error (or msg)
+  (local-set-key (kbd "M-[") 'previous-error)     ; Go to previous error or msg
+
+  ;; Misc go stuff
+  (auto-complete-mode 1)
+  (auto-revert-mode 1))                         ; Enable auto-complete mode
+
+;; Connect go-mode-hook with the function we just defined
+(add-hook 'go-mode-hook 'my-go-mode-hook)
+
+
 ;; Rust
 (setq rust-rustfmt-bin "~/.cargo/bin/rustfmt")
-(setq rust-format-on-save t)
+;(setq rust-format-on-save t)
 (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH
 (setq racer-rust-src-path "/home/mrogalski/rust/src") ;; Rust source code PATH
 (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 (add-hook 'rust-mode-hook
           (lambda ()
-            (racer-mode)
-	        (eldoc-mode)
+            ;(racer-mode)
+            (eldoc-mode)
             (flycheck-mode)
-            (company-mode)
-            (local-set-key (kbd "C-c h") #'racer-describe)))
+            ;(company-mode)
+            ;(local-set-key (kbd "C-c h") #'racer-describe)
+	    ))
 
 
 
@@ -103,19 +148,19 @@ cat << 'EOF' > ~/.emacs.d/init.el
 (global-set-key [f10] 'google-show-matching-tags)
 (grok-init)
 
-(custom-set-variables
- '(inhibit-default-init nil)
- '(inhibit-startup-screen t)
- '(initial-major-mode (quote org-mode))
- '(initial-scratch-message "* ")
- '(server-mode t))
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight semi-light :height 203 :width normal :foundry "CYEL" :family "Iosevka")))))
+ '(default ((t (:inherit nil :stipple nil :background "white" :foreground "black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight light :height 140 :width normal :foundry "unknown" :family "Iosevka")))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes (quote ("a4c9e536d86666d4494ef7f43c84807162d9bd29b0dfd39bdf2c3d845dcc7b2e" default)))
+ '(fci-rule-color "#3E4451"))
 EOF
 ```
 
@@ -133,16 +178,6 @@ EOF
 
 ```bash
 mkdir ~/bin
-
-cat << 'EOF' > ~/.profile
-. "$HOME/.variables"
-
-if [ -n "$BASH_VERSION" ]; then
-    if [ -f "$HOME/.bashrc" ]; then
-    . "$HOME/.bashrc"
-    fi
-fi
-EOF
 
 cat << 'EOF' > ~/.variables
 export EDITOR=emacs

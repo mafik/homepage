@@ -24,8 +24,10 @@ function showLanguage() {
 
 localStorage.language = localStorage.language || navigator.language;
 
-if (localStorage.language == 'pl-PL') {
+if (localStorage.language.startsWith('pl')) {
   localStorage.language = 'pl';
+} else {
+  localStorage.language = 'en';
 }
 
 showLanguage();

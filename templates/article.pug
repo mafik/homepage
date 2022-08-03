@@ -26,27 +26,5 @@ block body
     - var encodedDescPL = encodeURIComponent(page.metadata.desc_pl || page.metadata.desc);
     - var encodedDescEN = encodeURIComponent(page.metadata.desc_en || page.metadata.desc);
     article!= page.html
-      h2(lang='en') Share:
-      h2(lang='pl') Podaj dalej:
-
-      a.twitter-share-button(href="https://twitter.com/intent/tweet",data-via="mafikpl",data-url=config.url+page.url,data-size="large") Tweet
-      script.
-        window.twttr = (function(d, s, id) {
-          var js, fjs = d.getElementsByTagName(s)[0],
-            t = window.twttr || {};
-          if (d.getElementById(id)) return t;
-          js = d.createElement(s);
-          js.id = id;
-          js.crossOrigin = '';
-          js.src = "https://platform.twitter.com/widgets.js";
-          fjs.parentNode.insertBefore(js, fjs);
-
-          t._e = [];
-          t.ready = function(f) {
-            t._e.push(f);
-          };
-
-          return t;
-        }(document, "script", "twitter-wjs"));
 
     script(src='/i18n.js')

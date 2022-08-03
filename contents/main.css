@@ -1,6 +1,6 @@
 html {
   font-family: "Fira Sans", sans-serif;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 body {
@@ -32,7 +32,9 @@ body.index nav li {
   margin: .5em;
 }
 body.index nav ul.articles li {
-  background: #FFF2DB;
+  background: #e9ecff;
+  border: 3px outset #f2f4ff;
+  border-radius: .5em;
 }
 
 article {
@@ -79,9 +81,9 @@ nav time {
     color: white;
 }
 
-a { color: #d44; text-decoration: none;}
-a:visited { color: #c77; }
-a:hover { color: #f88; }
+a { color: rgb(44, 65, 227); }
+a:visited { color: rgb(126, 60, 232); }
+a:hover { color: rgb(136, 154, 255); }
 
 p {
     margin: 1em 0;

@@ -1,6 +1,8 @@
 nav
-  h1
-    a(href="/",style="color:black")=config.name
+  h1(lang='pl')
+    a(href="/",style="color:black", title=config.desc_pl)= config.desc_pl
+  h1(lang='en')
+    a(href="/",style="color:black", title=config.desc_en)= config.desc_en
   div
     img.lang(src='/lang.png',title='Language PL/EN')
     a(rel='home',href=config.url+'/feed.xml',type='application/rss+xml',title='RSS')

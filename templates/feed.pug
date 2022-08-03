@@ -5,10 +5,10 @@ rss(version='2.0',
     xmlns:dc='http://purl.org/dc/elements/1.1/'
     xmlns:atom='http://www.w3.org/2005/Atom')
   channel
-    title= config.name
+    title= config.desc_en
     atom:link(href=config.url + '/feed.xml', rel='self', type='application/rss+xml')
     link= config.url
-    description= config.description
+    description= config.desc_en
     pubDate= articles[0].rfc822date
     language en
     for article in articles

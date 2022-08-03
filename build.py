@@ -2,7 +2,7 @@
 
 import markdown, os, os.path, shutil, subprocess, json, tempfile, atexit, time, email.utils
 
-shutil.rmtree('build')
+shutil.rmtree('build', ignore_errors=True)
 
 pages = []
 page_properties = 'date template title'.split()
@@ -53,7 +53,6 @@ for contents_dir_path, dirnames, filenames in os.walk('contents'):
 options = dict()
 options['config'] = json.loads(open('config.json').read())
 options['articles'] = [p for p in pages if p['template'].startswith('article')]
-
 options['articles'].sort(key=lambda p: p['date'], reverse=True)
 
 print("Starting renderers...")
@@ -74,7 +73,6 @@ for page in pages:
     output_fd = open('build' + format_path(page['path'], page['filename']), 'w')
     renderer = subprocess.Popen(["pug", "--obj", options_path, "--path", ".", "--pretty"], stdin=template_fd, stdout=output_fd, cwd='templates')
     renderers.append(renderer)
-
 
 print("Waiting for renderers to finish...")
     

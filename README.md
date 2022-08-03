@@ -1,5 +1,3 @@
-`npm install`
+`npm install pug-cli -g`
 
-`npm install wintersmith -g`
-
-`wintersmith preview`
+`./build.py && python3 -m http.server 8000`

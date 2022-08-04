@@ -101,20 +101,17 @@ thumb: thumb.jpg
 <p lang="en">You can drop a TTF file anywhere on this page. Alternatively click the button below to open a TTF file.</p>
 <p lang="pl">Podobnie jak z obrazem, czcionkę TTF możesz zwyczajnie przeciągnąć na stronę. Alternatywnie możesz też kliknąć przycisk "Wybierz plik" poniżej.</p>
 
-<p lang="en">Various fonts can offer different character support. They also have different glyphs & aspect ratio.
-For optimal results upload the TTF file of the font to be used. By default
-<a href="https://design.ubuntu.com/font/">Ubuntu Monospace</a> will be used.
-It is the default terminal font on Ubuntu-based systems.</p>
+<p lang="en">Various fonts offer different character support. They also have different glyphs & aspect ratio.
+For optimal results upload the TTF file of the font used to display the ANSI Art. By default
+<a href="https://juliamono.netlify.app/">Julia Mono</a> will be used.</p>
 <p lang="pl">Różne czcionki obsługują nieco inne zestawy znaków. Różnią się też (oczywiście) kształtem znaków oraz wysokością linii.
-Dla optymalnych rezultatów, dobrze jest wybrać dokładnie taką czcionkę, jaka będzie użyta do wyświetlenia ANSI Artu.
-Domyślny wybór to <a href="https://design.ubuntu.com/font/">Ubuntu Monospace</a>.
-Jest to domyślna czcionka w terminalach systemu Ubuntu.</p>
+Dla optymalnych rezultatów, dobrze jest wybrać dokładnie taką czcionkę, jaka będzie użyta do wyświetlenia ANSI Artu. Domyślny wybór to <a href="https://juliamono.netlify.app/">Julia Mono</a>.</p>
 
 <p lang="en">Note that only fixed-width characters will be used. Most of variable-size fonts will not work.</p>
 <p lang="pl">Poniższy konwerter obsługuje jedynie znaki o stałej szerokości. Większość czcionek o zmiennej szerokości znaku nie zadziała.</p>
 
 <div id="font">
-  <p id="sample">ABCDEF</p>
+  <p id="sample">No font loaded. Probably the script didn't load yet (or maybe it crashed - check the JS console to find out).</p>
 </div>
 <input id="font-input" type="file" onchange="FontInputChanged(event);">
 

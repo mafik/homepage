@@ -80,8 +80,8 @@ thumb: thumb.jpg
 <p lang="pl">Oto kilka przykładów co można osiągnąć:</p>
 <img src="sample1.png"><img src="sample2.png"><img src="sample3.png"><img src="sample4.png">
 
-<p lang="en">This website allows you to render a regular image as an ANSI🔥Art. Just drop your image / TTF font of choice onto this webpage & click the <em>Render</em> button below. If you create something cool, please post it to <a href="https://www.reddit.com/r/ANSIart/">/r/ANSIart/</a>.</p>
-<p lang="pl">Poniższa strona pozwala na konwersję dowolnego obrazu na ANSI🔥Art. Przeciągnij wybrany obraz / czcionkę TTF na tą stronę, a następnie kliknij przycisk <em>Renderuj</em> poniżej. Jeśli stworzysz coś ciekawego, nie zapomnij pochwalić się na <a href="https://www.reddit.com/r/ANSIart/">/r/ANSIart/</a>!</p>
+<p lang="en">This website allows you to render a regular image as an ANSI🔥Art. Just drop your image / TTF font of choice onto this webpage & click the <em>Render</em> button below.</p>
+<p lang="pl">Poniższa strona pozwala na konwersję dowolnego obrazu na ANSI🔥Art. Przeciągnij wybrany obraz / czcionkę TTF na tą stronę, a następnie kliknij przycisk <em>Renderuj</em> poniżej.</p>
 
 <p lang="en">For those, who know how to git pull & push, there is also a <a href="https://github.com/mafik/ansi-art">C++ library</a> for rendering ANSI🔥Art.</p>
 <p lang="pl">Dla tych, którzy wiedzą co to <code>git pull</code> i <code>push</code>, dostępna jest także <a href="https://github.com/mafik/ansi-art">biblioteka C++</a> do renderowania ANSI🔥Art-u.</p>

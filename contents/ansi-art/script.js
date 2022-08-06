@@ -101,7 +101,9 @@ function ImageInputChanged(event) {
 function LoadImage() {
   var w = img.naturalWidth;
   var h = img.naturalHeight;
-  var canvas = new OffscreenCanvas(w, h);
+  var canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
   var ctx = canvas.getContext('2d');
   ctx.drawImage(img, 0, 0);
   var rgba_arr = ctx.getImageData(0, 0, w, h).data.buffer;
@@ -118,9 +120,6 @@ function ShowFontSample(data_url) {
   var font = new FontFace('AnsiArt', 'url(' + data_url + ')');
   document.fonts.clear();
   document.fonts.add(font);
-}
-function ColorSetChanged(event) {
-  art.color_palette = Module.ColorPalette.values[event.target.value];
 }
 function ForbiddenChanged(event) {
   art.forbidden_characters = event.target.value;

@@ -129,20 +129,6 @@ Dla optymalnych rezultatów, dobrze jest wybrać dokładnie taką czcionkę, jak
     znaki, które zastępowane są na systemie Ubuntu.</p>
   <textarea id="forbidden_characters_textarea" onchange="ForbiddenChanged(event);">⬛⬜⏪⏩⏫⏬⚡⚪⚫⭐⭕🆎🆑🆒🆓🆔🆕🆖🆗🆘🆙🆚🌑🌒🌓🌔🌕🌖🌗🌘❌</textarea>
 </div>
-<div id="colorset">
-  <h3 lang="en">Colors</h3>
-  <h3 lang="pl">Kolory</h3>
-  <select id="color-select" onchange="ColorSetChanged(event);">
-    <option lang="en" value="0">24-bit color</option>
-    <option lang="pl" value="0">kolor 24-bitowy</option>
-    <option lang="en" value="1">8-bit color</option>
-    <option lang="pl" value="1">kolor 8-bitowy</option>
-    <option lang="en" value="2">0-bit (white on black)</option>
-    <option lang="pl" value="2">biały tekst na czarnym tle</option>
-    <option lang="en" value="3">0-bit (black on white)</option>
-    <option lang="pl" value="3">czarny tekst na białym tle</option>
-  </select>
-</div>
 <div id="size">
   <h3 lang="en">Width</h3>
   <h3 lang="pl">Szerokość</h3>

@@ -1,7 +1,7 @@
 ---
 title: Dessin
 date: 2013-10-01
-template: article.pug
+renderer: render_article
 desc_pl: Wreszcie sposób hakowania na touchscreenie
 desc_en: Finally, a way to hack on touchscreen
 title_pl: Dessin

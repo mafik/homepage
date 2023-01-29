@@ -1,3 +1,1 @@
----
-template: layout.pug
----
+renderer: render_index

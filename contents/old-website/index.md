@@ -3,7 +3,7 @@ title_pl: Stara strona
 title_en: Old webpage
 desc_pl: Zobacz, co zmieniło się na https://mrogalski.eu
 desc_en: Check out what has changed on https://mrogalski.eu
-template: article.pug
+renderer: render_article
 thumb: background.jpg
 date: 2014-02-18
 ---

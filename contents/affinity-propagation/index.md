@@ -4,7 +4,7 @@ title_pl: Affinity Propagation
 title_en: Affinity Propagation
 desc_pl: Jak grupować dane, o których nic nie wiemy
 desc_en: How to group stuff without any prior knowledge
-template: article.pug
+renderer: render_article
 thumb: thumb.jpg
 ---
 
@@ -16,7 +16,7 @@ thumb: thumb.jpg
   
 <p lang=pl>Opis algorytmu możesz przeczytać <a href="http://www.psi.toronto.edu/affinitypropagation/FreyDueckScience07.pdf">tutaj</a>, a moją javascriptową implementację, <a href=script.js>tutaj</a>.
   
-<p lang=en>Description of the algorithm can be found <a href="http://www.psi.toronto.edu/affinitypropagation/FreyDueckScience07.pdf">here</a>. My javascript implementation can be found <a href=script.js>here</a>.
+<p lang=en>Description of the algorithm can be found <a href="http://www.psi.toronto.edu/affinitypropagation/FreyDueckScience07.pdf">here</a>. My javascript implementation can be found <a href=script.js>here</a>.</p>
 
 <canvas style="background:#eee; width:100%; height:20em" id=fg></canvas>
 <script src="script.js"></script>

@@ -4,10 +4,9 @@ title_pl: ANSI🔥Art
 title_en: ANSI🔥Art
 desc_pl: ANSI Art + Unicode + 24-bit color
 desc_en: ANSI Art + Unicode + 24-bit color
-template: article.pug
+renderer: render_article
 thumb: thumb.jpg
 ---
-
 <style>
   hr {
     border-color: black;

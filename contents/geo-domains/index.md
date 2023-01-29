@@ -4,7 +4,7 @@ title_pl: Domeny Koordynatowe
 title_en: Geo-Coord-Domains
 desc_pl: Darmowe domeny dla każdego - rewolucja Internet Of Things
 desc_en: Free domains for every device - revolution in Internet Of Things
-template: article.pug
+renderer: render_article
 thumb: thumb.jpg
 ---
 

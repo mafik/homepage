@@ -3,7 +3,7 @@ title_pl: GLSL
 title_en: GLSL
 desc_pl: Kopalnia skarbów dla amatorów (i nie tylko) GLSL
 desc_en: Gold mine for every ameteur (and not only) of GLSL
-template: article.pug
+renderer: render_article
 thumb: evolution.jpg
 date: 2014-04-10
 ---

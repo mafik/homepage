@@ -1,7 +1,8 @@
 ---
-title: Crypto Lottery
+title_pl: Crypto Lottery
+title_en: Crypto Lottery
 date: 2014-02-13
-template: article.pug
+renderer: render_article
 desc_pl: Jedyny sposób na to, żeby nie dać się oszukać w kasynie online
 desc_en: The only way not to get cheated in an online casino
 tags_pl: Kryptografia, Projekty, Node.js, HTML5

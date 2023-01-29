@@ -4,7 +4,7 @@ title_pl: Generator Tekstów wg. Łańcucha Markowa
 title_en: Text Generator Using Markov Chains
 desc_pl: Najszybszy sposób na automatyczne generowanie realistycznych tekstów.
 desc_en: Fastest way to automatically generate realistic texts.
-template: article.pug
+renderer: render_article
 thumb: thumb.jpg
 ---
 

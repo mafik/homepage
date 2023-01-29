@@ -3,7 +3,7 @@ title_pl: Kalkulator wartości wolnego czasu
 title_en: Free time value calculator
 desc_pl: Za pomocą tego wzoru obliczysz ile warta jest godzina twojego życia.
 desc_en: Use this formula to calculate how much is worth an hour of your life.
-template: article.pug
+renderer: render_article
 thumb: efficiency.png
 date: 2015-07-15
 ---

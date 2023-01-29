@@ -3,7 +3,7 @@ title_pl: Getting Things Done (w skrócie)
 title_en: Getting Things Done (in a nutshell) [PL]
 desc_pl: Sztuka bezstresowej efektywności - dla niecierpliwych.
 desc_en: Art of stress-free productivity - for the impatient.
-template: article.pug
+renderer: render_article
 thumb: panda.jpg
 date: 2014-08-02
 ---

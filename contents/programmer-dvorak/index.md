@@ -1,24 +1,49 @@
 ---
-date: 2014-02-12
-title_pl: Dvorak Programisty w Konsoli Linuksa
-title_en: Programmer Dvorak in Linux Console
-desc_pl: Obsługa "dvoraka programisty" w konsoli linuxa
-desc_en: Fix for linux users using programmer dvorak in system console
+date: 2023-01-29
+title_pl: Polski Dvorak Programisty
+title_en: Polish Programmer Dvorak
+desc_pl: Autorskie modyfikacje dodające obsługę "polskiego dvoraka programisty" w systemie Windows oraz w konsoli (TTY) Linuksa.
+desc_en: Proprietary modifications adding support for "polish programmer's dvorak" in Windows and in the console (TTY) of Linux.
 template: article.pug
 thumb: thumb.png
 ---
 
-<h1 lang=pl>Dvorak Programisty w Konsoli Linuksa</h1>
-<h1 lang=en>Programmer Dvorak in Linux Console</h1>
+<h1 lang=pl>Polski Dvorak Programisty</h1>
+<h1 lang=en>Polish Programmer Dvorak</h1>
 
-<p lang=pl>Po dość bolesnym rytuale przejścia, dvorak programisty okazuje się całkiem przyjemnym układem klawiszy. Jedeny problem, jaki napotkałem przez kilka lat użytkowania to brak jego obsługi w systemowej konsoli na większości dystrybucji (jedynie Ubuntu o to zadbało). Przygotowałem ostatnio odpowiedni plik, który dodaje w konsoli obsłgę tego układu.
+<p lang=pl><small>Oryginalnie opublikowano pod kątem Linuksa 12 lutego 2014. Aktualizacja dla Windowsa 29 stycznia 2023.</small></p>
+<p lang=en><small>Originally published for Linux on February 12, 2014. Updated for Windows on January 29, 2023.</small></p>
 
-<p lang=en>After painful rite of passage, programmer dvorak turned out to be quite pleasant set of keys. Only problem that I've encountered during several years of using it was lack of support in linux system console in almost every distribution (with notable exception  of Ubuntu). Recently I have prepared keymap file that finally adds support for this layout.
+<img src=thumb.png style="float: right; width: 50%">
 
-<p lang=pl>Jeśli chcesz go zainstalować, pobierz go [stąd][0] oraz zapisz w `/usr/share/kbd/keymaps/i386/dvorak/`. Do jednorazowego załadowania możesz użyć polecenia `loadkeys dvorak-pl`, a aby utrwalić efekt (jeśli korzystasz z `systemd`), do pliku `/etc/vconsole.conf` dopisz `KEYMAP=dvorak-pl`.
+<p lang=pl>Po dość bolesnym rytuale przejścia, dvorak programisty okazał się dla mnie całkiem przyjemnym układem klawiszy. Jedeny problem, jaki napotkałem przez wiele lat użytkowania to brak jego obsługi pod Windowsem oraz w systemowej konsoli na większości dystrybucji (jedynie Ubuntu o to zadbało). Poniżej udostępniam przygotowane przez siebie pliki, które dodają jego obsługę w tych kilku sytuacjach.
 
-<p lang=en>If you want to install it, download it from [here][0] and save in `/usr/share/kbd/keymaps/i386/dvorak/`. To load it once, use `loadkeys dvorak-pl`. To achieve permanent effect (if you are using `systemd`), open file `/etc/vconsole.conf` and append line `KEYMAP=dvorak-pl`.
+<p lang=en>After a rather painful rite of passage, the programmer's dvorak turned out to be quite a pleasant key layout for me. The only problem I've encountered over many years of use is its lack of support under Windows and in the system console on most distributions (only Ubuntu has taken care of this). Below I'm providing files I've prepared to add its support in these few situations.
 
-<p lang=pl>Słowa kluczowe (co by zagubieni internauci łatwiej trafiali): DVP, dvp, dvorak, programmer dvorak, dvorak programisty, vty, tty, system console, linux console.</p>
+<h3 lang=pl>Konsola Linuksa (znana też jako TTY)</h3>
+<h3 lang=en>Linux console (a.k.a. TTY)</h3>
 
-   [0]: dvorak-pl.map.gz
+<p lang=pl>Pobierz plik <a href="dvorak-pl.map.gz">dvorak-pl.map.gz</a> oraz zapisz go w <code>/usr/share/kbd/keymaps/i386/dvorak/</code>. Do jednorazowego załadowania możesz teraz użyć polecenia <code>loadkeys dvorak-pl</code>, a aby utrwalić efekt (jeśli twoja dystrybucja korzysta z systemd), do pliku <code>/etc/vconsole.conf</code> dopisz <code>KEYMAP=dvorak-pl</code>.
+
+<p lang=en>Download <a href="dvorak-pl.map.gz">dvorak-pl.map.gz</a> and save it to <code>/usr/share/kbd/keymaps/i386/dvorak/</code>. You can now use <code>loadkeys dvorak-pl</code> for a one-time load, and to persist the effect (if your distribution uses systemd), append line <code>KEYMAP=dvorak-pl</code> to <code>/etc/vconsole.conf</code>.
+
+<h3>Windows</h3>
+
+<p lang=pl>W Windowsie nowe układy klawiatury to pliki .dll, które instalowane są w odpowiednich katalogach systemowych. Aby zainstalować przygotowany przeze mnie układ, pobierz <a href=dvp.zip>dvp.zip</a> i zainstaluj go uruchamiając <em>setup.exe</em>. Plik przygotowałem w programie MSKLC (Microsoft Keyboard Layout Creator), dostępnym na stronach Microsoftu, lub, dla wygody, <a href="MSKLC.zip">tu</a>. Jeśli chcesz zmodyfikować przygotowany przeze mnie układ, lub też ze względów bezpieczeństwa chcesz samemu skompilować pliki DLL, możesz posłużyć się źródłami mojego układu - <a href="dvp.klc">dvp.klc</a>.
+
+<p lang=en>In Windows, new keyboard layouts are .dll files that are installed in the appropriate system directories. To install the layout I prepared, download <a href=dvp.zip>dvp.zip</a> and install it by running <em>setup.exe</em>. I prepared it in MSKLC (Microsoft Keyboard Layout Creator), available on Microsoft's website, or, for convenience, <a href="MSKLC.zip">here</a>. If you want to modify the layout I prepared, or for security reasons you want to compile the DLL files yourself, you can use my layout sources - <a href="dvp.klc">dvp.klc</a>.
+
+<p lang=pl>Układ klawiszy bez modyfikatorów:</p>
+<p lang=en>Key layout without modifiers:</p>
+
+<a href="dvp.jpg"><img src="dvp.jpg" style="max-width: 100%"></a>
+
+<p lang=pl>Układ klawiszy z prawym klawiszem Alt:</p>
+<p lang=en>Layout with the right Alt key:</p>
+
+<a href="dvpAltGr.jpg"><img src="dvpAltGr.jpg" style="max-width: 100%"></a>
+
+<p lang=pl>Układ klawiszy z klawiszem Shift:</p>
+<p lang=en>Layout with the Shift key:</p>
+
+<a href="dvpShft.jpg"><img src="dvpShft.jpg" style="max-width: 100%"></a>

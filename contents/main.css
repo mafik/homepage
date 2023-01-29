@@ -134,17 +134,16 @@ pre {
   font-family: "Fira Mono";
   overflow: auto;
   background: #eee;
-  border: 2px dashed #ccc;
-  border-radius: 0.3em;
+  border: 1px dashed #ccc;
   margin: 1.8em 0;
   padding: 1em;
 }
 
 p code, ul code, dl code {
+  font-family: "Fira Mono";
   background: #eee;
-  padding: 0 0.2em 0.2em;
-  border: 2px dashed #ccc;
-  border-radius: 0.3em;
+  padding: 0 0.2em 0em;
+  border: 1px dashed #ccc;
   position: relative;
   top: -0.1em;
   white-space: nowrap;

@@ -1,0 +1,26 @@
+doctype html
+block pre
+html(itemscope, itemtype='http://schema.org/' + (microdata_type || 'Blog'))
+  head
+    block head
+      meta(charset='utf-8')
+      meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+      meta(name='viewport', content='width=device-width, initial-scale=1')
+      block meta
+        meta(itemprop='name', content=config.desc_en)
+        meta(itemprop='description', content='Projects, ideas and tools for hackers interested in artificial intelligence, programming languages and casual hacking.')
+        meta(name='description', content='Projects, ideas and tools for hackers interested in artificial intelligence, programming languages and casual hacking.')
+        meta(itemprop='image', content=config.url + '/snail.jpg')
+
+      link(rel='shortcut icon', href='/favicon.ico')
+      title
+        block title
+          = config.desc_en
+      link(rel='alternate', href=config.url+'/feed.xml', type='application/rss+xml', title='RSS')
+      link(href='https://fonts.googleapis.com/css?family=Fira+Mono|Fira+Sans:400,300,500,600,400italic&subset=latin-ext',rel='stylesheet',type='text/css')
+      link(rel='stylesheet', href='/main.css')
+      link(rel='stylesheet', href='/code.css')
+  block body
+    body.index
+      include nav.pug
+      script(src='/i18n.js')

@@ -2,8 +2,8 @@
 date: 2023-01-29
 title_pl: Polski Dvorak Programisty
 title_en: Polish Programmer Dvorak
-desc_pl: Autorskie modyfikacje dodające obsługę "polskiego dvoraka programisty" w systemie Windows oraz w konsoli (TTY) Linuksa.
-desc_en: Proprietary modifications adding support for "polish programmer's dvorak" in Windows and in the console (TTY) of Linux.
+desc_pl: Autorskie modyfikacje dodające obsługę Polskiego Dvoraka Programisty w systemie Windows oraz w konsoli (TTY) Linuksa.
+desc_en: Adding support for Polish Programmer's Dvorak to Windows and to the Linux console (TTY).
 renderer: render_article
 thumb: thumb.png
 ---

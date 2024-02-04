@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import functools
 import http.server
 import socketserver
 import socket
@@ -27,11 +28,14 @@ TITLE_EN = "Marek Rogalski's Home Page"
 TITLE_PL = "Strona domowa Marka Rogalskiego"
 DESC_EN = "Projects, ideas and tools for hackers interested in artificial intelligence, programming languages and casual hacking."
 
-def render_nav():
+def get_articles():
     articles = [p for p in pages if hasattr(p, 'date')]
     articles.sort(key=lambda a: a.date, reverse=True)
+    return articles
+
+def render_nav():
     list_html = ''
-    for article in articles:
+    for article in get_articles():
         try:
             list_html += f'''<li>
                 <a href="{article.url}" lang="pl" title="{article.desc_pl}">{article.title_pl}</a>
@@ -42,12 +46,13 @@ def render_nav():
     return f'''<nav>
       <h1 lang="pl"><a href="/" style="color:black" title="{TITLE_PL}">{TITLE_PL}</a></h1>
       <h1 lang="en"><a href="/" style="color:black" title="{TITLE_EN}">{TITLE_EN}</a></h1>
-      <div><img class="lang" src="/lang.png" title="Language PL/EN"><a rel="home" href="https://mrogalski.eu/feed.xml" type="application/rss+xml" title="RSS"><img class="rss" src="data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIg0KICAgICBpZD0iUlNTaWNvbiINCiAgICAgdmlld0JveD0iMCAwIDggOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiPg0KDQogIDx0aXRsZT5SU1MgZmVlZCBpY29uPC90aXRsZT4NCg0KICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KICAgIC5idXR0b24ge3N0cm9rZTogbm9uZTsgZmlsbDogb3JhbmdlO30NCiAgICAuc3ltYm9sIHtzdHJva2U6IG5vbmU7IGZpbGw6IHdoaXRlO30NCiAgPC9zdHlsZT4NCg0KICA8cmVjdCAgIGNsYXNzPSJidXR0b24iIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHJ4PSIxLjUiIC8+DQogIDxjaXJjbGUgY2xhc3M9InN5bWJvbCIgY3g9IjIiIGN5PSI2IiByPSIxIiAvPg0KICA8cGF0aCAgIGNsYXNzPSJzeW1ib2wiIGQ9Im0gMSw0IGEgMywzIDAgMCAxIDMsMyBoIDEgYSA0LDQgMCAwIDAgLTQsLTQgeiIgLz4NCiAgPHBhdGggICBjbGFzcz0ic3ltYm9sIiBkPSJtIDEsMiBhIDUsNSAwIDAgMSA1LDUgaCAxIGEgNiw2IDAgMCAwIC02LC02IHoiIC8+DQoNCjwvc3ZnPg=="></a></div>
+      <div><img class="lang" src="/lang.png" title="Language PL/EN"><a rel="home" href="https://mrogalski.eu/feed.xml" type="application/rss+xml" title="RSS"><img class="rss" alt="RSS" src="data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIg0KICAgICBpZD0iUlNTaWNvbiINCiAgICAgdmlld0JveD0iMCAwIDggOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiPg0KDQogIDx0aXRsZT5SU1MgZmVlZCBpY29uPC90aXRsZT4NCg0KICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KICAgIC5idXR0b24ge3N0cm9rZTogbm9uZTsgZmlsbDogb3JhbmdlO30NCiAgICAuc3ltYm9sIHtzdHJva2U6IG5vbmU7IGZpbGw6IHdoaXRlO30NCiAgPC9zdHlsZT4NCg0KICA8cmVjdCAgIGNsYXNzPSJidXR0b24iIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHJ4PSIxLjUiIC8+DQogIDxjaXJjbGUgY2xhc3M9InN5bWJvbCIgY3g9IjIiIGN5PSI2IiByPSIxIiAvPg0KICA8cGF0aCAgIGNsYXNzPSJzeW1ib2wiIGQ9Im0gMSw0IGEgMywzIDAgMCAxIDMsMyBoIDEgYSA0LDQgMCAwIDAgLTQsLTQgeiIgLz4NCiAgPHBhdGggICBjbGFzcz0ic3ltYm9sIiBkPSJtIDEsMiBhIDUsNSAwIDAgMSA1LDUgaCAxIGEgNiw2IDAgMCAwIC02LC02IHoiIC8+DQoNCjwvc3ZnPg=="></a></div>
       <ul class="articles">{list_html}</ul>
       <hr>
       <ul>
         <li><a href="https://github.com/mafik/">GitHub: @mafik</a></li>
-        <li><a href="mailto:mafikpl@gmail.com">mafikpl@gmail.com</a></li>
+        <li><a href="https://101010.pl/@maf" rel="me">Mastodon: @maf@101010.pl</a></li>
+        <li><a href="mailto:mafikpl@gmail.com">Email: mafikpl@gmail.com</a></li>
       </ul>
     </nav>'''
 
@@ -96,12 +101,45 @@ def format_path(path, filename):
 
 class Page: pass
 
+class Feed(Page):
+    path = ''
+    source = ''
+    filename = 'feed.xml'
+    def render(self):
+        articles = get_articles()
+        items = ''
+        for article in articles:
+            permalink = URL + article.url
+            items += f'''<item>
+        <title>{article.title_en}</title>
+        <link>{permalink}</link>
+        <pubDate>{article.rfc822date}</pubDate>
+        <guid isPermaLink="true">{permalink}</guid>
+        <author>Marek Rogalski</author>
+        <media:thumbnail url="{permalink}{article.thumb}" />
+        <description>{article.desc_en}</description>
+</item>
+'''
+        return f'''<?xml version="1.0" encoding="utf-8" ?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>{TITLE_EN}</title>
+    <atom:link href="{URL}/feed.xml" rel="self" type="application/rss+xml"></atom:link>
+    <link>{URL}</link>
+    <description>{DESC_EN}</description>
+    <pubDate>{articles[0].rfc822date}</pubDate>
+    <language>en</language>
+    {items}
+  </channel>
+</rss>
+'''
+
 def build():
     shutil.rmtree('build', ignore_errors=True)
     print("Copying static files and importing Python modules...")
 
     global pages
-    pages = []
+    pages = [Feed()]
 
     for contents_dir_path, dirnames, filenames in os.walk('contents'):
         path = contents_dir_path[len('contents')+1:]
@@ -128,6 +166,7 @@ def build():
                     page.rfc822date = email.utils.formatdate(time_epoch, localtime=True)
                 page.path = path
                 page.url = format_path(path, page.filename if page.filename != 'index.html' else '')
+                page.render = functools.partial(globals()[page.renderer], page)
                 pages.append(page)
             else:
                 build_path = 'build' + format_path(path, filename)
@@ -140,7 +179,7 @@ def build():
         print("contents{} -> build{}".format(format_path(page.path, page.source), format_path(page.path, page.filename)))
 
         try:
-            html = globals()[page.renderer](page)
+            html = page.render()
         except Exception as e:
             raise Exception(f"Error while rendering page {page.path}/{page.source}") from e
                 

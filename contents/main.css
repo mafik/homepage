@@ -54,7 +54,7 @@ nav li {
 
 nav time {
     display: block;
-    color: #888;
+    color: #777;
 }
 
 .lang {
@@ -91,7 +91,6 @@ p {
 
 li {
   margin-bottom: 0.5em;
-  list-style-position: inside;
 }
 
 blockquote {

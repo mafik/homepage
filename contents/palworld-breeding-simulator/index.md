@@ -12,7 +12,7 @@ thumb: thumb.png
 
 <p>This website uses the Palworld breeding logic to find the best possible pals that can be obtained from a given initial Pal population.</p>
 
-<p>Enter the Pals that you have caught in the table below. This is the initial population that will be bred together to create stronger Pals.</p>
+<p>First enter the Pals that you have caught. This is the initial population that will be bred together to create stronger Pals. You can do this using the form at the bottom of the table or by drag & dropping the <code>Levels.sav</code> file from <code style="white-space:normal">C:\Users\&lt;Your Username&gt;\AppData\Local\Pal\Saved\SaveGames\&lt;Save Directory&gt;\</code> <button onclick="CopyPath()">Copy Path</button> into this page.</p>
 
 <p>Once you're ready to start the search, click one of the buttons below the table.</p>
 
@@ -86,5 +86,18 @@ thumb: thumb.png
 </style>
 </div>
 
+<script>
+function CopyPath() {
+  var copyText = document.querySelector("code");
+  var textArea = document.createElement("textarea");
+  textArea.value = "%LOCALAPPDATA%\\Pal\\Saved\\SaveGames\\";
+  document.body.appendChild(textArea);
+  textArea.select();
+  document.execCommand("Copy");
+  textArea.remove();
+}
+</script>
+<script src="pako_inflate.min.js"></script>
+<script src="decoder.js"></script>
 <script src="index.js"></script>
 <script src="breed.js"></script>

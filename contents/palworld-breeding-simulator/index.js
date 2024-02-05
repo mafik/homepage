@@ -24,6 +24,458 @@ if ('pals' in localStorage) {
   pals = JSON.parse(localStorage.pals);
 }
 
+// Hashtables used for encoding Palworld identifiers to our C++ enum values.
+let EncodeIDName = {};
+
+let EncodeTrait = {};
+EncodeTrait.undefined = 0;
+
+let EncodeGender = {};
+EncodeGender["EPalGenderType::Male"] = 0;
+EncodeGender["EPalGenderType::Female"] = 1;
+
+let CharacterIDToIDName = {
+  Anubis: "Anubis",
+  Boss_Anubis: "Anubis",
+  FlameBuffalo: "Arsox",
+  BOSS_FlameBuffalo: "Arsox",
+  BlackMetalDragon: "Astegon",
+  BOSS_BlackMetalDragon: "Astegon",
+  GYM_ThunderDragonMan: "Axel & Orserk",
+  BlueDragon: "Azurobe",
+  BOSS_BlueDragon: "Azurobe",
+  BadCatgirl: "Bad Catgirl",
+  BOSS_BadCatgirl: "Bad Catgirl",
+  ThunderBird: "Beakon",
+  BOSS_ThunderBird: "Beakon",
+  BeardedDragon: "Bearded Dragon",
+  BOSS_BeardedDragon: "Bearded Dragon",
+  SoldierBee: "Beegarde",
+  BOSS_SoldierBee: "Beegarde",
+  KingBahamut: "Blazamut",
+  BOSS_KingBahamut: "Blazamut",
+  Manticore: "Blazehowl",
+  BOSS_Manticore: "Blazehowl",
+  Manticore_Dark: "Blazehowl Noct",
+  BOSS_Manticore_Dark: "Blazehowl Noct",
+  BlueberryFairy: "Blueberry Fairy",
+  BOSS_BlueberryFairy: "Blueberry Fairy",
+  ElecLion: "Boltmane",
+  BOSS_ElecLion: "Boltmane",
+  LittleBriarRose: "Bristla",
+  BOSS_LittleBriarRose: "Bristla",
+  SakuraSaurus: "Broncherry",
+  BOSS_SakuraSaurus: "Broncherry",
+  SakuraSaurus_Water: "Broncherry Aqua",
+  BOSS_SakuraSaurus_Water: "Broncherry Aqua",
+  BrownRabbit: "Brown Rabbit",
+  BOSS_BrownRabbit: "Brown Rabbit",
+  Ronin: "Bushi",
+  BOSS_Ronin: "Bushi",
+  BerryGoat: "Caprity",
+  BOSS_BerryGoat: "Caprity",
+  PinkCat: "Cattiva",
+  BOSS_PinkCat: "Cattiva",
+  DarkCrow: "Cawgnito",
+  BOSS_DarkCrow: "Cawgnito",
+  FlyingManta: "Celaray",
+  BOSS_FlyingManta: "Celaray",
+  ChickenPal: "Chikipi",
+  BOSS_ChickenPal: "Chikipi",
+  WeaselDragon: "Chillet",
+  BOSS_WeaselDragon: "Chillet",
+  CuteButterfly: "Cinnamoth",
+  BOSS_CuteButterfly: "Cinnamoth",
+  WoolFox: "Cremis",
+  BOSS_WoolFox: "Cremis",
+  WhiteTiger: "Cryolinx",
+  BOSS_WhiteTiger: "Cryolinx",
+  DreamDemon: "Daedream",
+  BOSS_DreamDemon: "Daedream",
+  DarkMutant: "Dark Mutant",
+  BOSS_DarkMutant: "Dark Mutant",
+  RaijinDaughter: "Dazzi",
+  BOSS_RaijinDaughter: "Dazzi",
+  NegativeKoala: "Depresso",
+  BOSS_NegativeKoala: "Depresso",
+  DrillGame: "Digtoise",
+  BOSS_DrillGame: "Digtoise",
+  FlowerDinosaur: "Dinossom",
+  BOSS_FlowerDinosaur: "Dinossom",
+  FlowerDinosaur_Electric: "Dinossom Lux",
+  BOSS_FlowerDinosaur_Electric: "Dinossom Lux",
+  Garm: "Direhowl",
+  BOSS_Garm: "Direhowl",
+  BlackFurDragon: "Dragostrophe",
+  BOSS_BlackFurDragon: "Dragostrophe",
+  LazyCatfish: "Dumud",
+  BOSS_LazyCatfish: "Dumud",
+  Deer: "Eikthyrdeer",
+  BOSS_Deer: "Eikthyrdeer",
+  Deer_Ground: "Eikthyrdeer Terra",
+  BOSS_Deer_Ground: "Eikthyrdeer Terra",
+  QueenBee: "Elizabee",
+  BOSS_QueenBee: "Elizabee",
+  FairyDragon: "Elphidran",
+  BOSS_FairyDragon: "Elphidran",
+  FairyDragon_Water: "Elphidran Aqua",
+  BOSS_FairyDragon_Water: "Elphidran Aqua",
+  Horus: "Faleris",
+  BOSS_Horus: "Faleris",
+  FeatherOstrich: "Feather Ostrich",
+  BOSS_FeatherOstrich: "Feather Ostrich",
+  CatVampire: "Felbat",
+  BOSS_CatVampire: "Felbat",
+  FengyunDeeper: "Fenglope",
+  BOSS_FengyunDeeper: "Fenglope",
+  LavaGirl: "Flambelle",
+  BOSS_LavaGirl: "Flambelle",
+  FlowerRabbit: "Flopie",
+  BOSS_FlowerRabbit: "Flopie",
+  IceFox: "Foxcicle",
+  BOSS_IceFox: "Foxcicle",
+  Kitsunebi: "Foxparks",
+  BOSS_Kitsunebi: "Foxparks",
+  IceHorse: "Frostallion",
+  BOSS_IceHorse: "Frostallion",
+  IceHorse_Dark: "Frostallion Noct",
+  BOSS_IceHorse_Dark: "Frostallion Noct",
+  BluePlatypus: "Fuack",
+  BOSS_BluePlatypus: "Fuack",
+  CuteMole: "Fuddler",
+  BOSS_CuteMole: "Fuddler",
+  Eagle: "Galeclaw",
+  BOSS_Eagle: "Galeclaw",
+  SharkKid: "Gobfin",
+  BOSS_SharkKid: "Gobfin",
+  SharkKid_Fire: "Gobfin Ignis",
+  BOSS_SharkKid_Fire: "Gobfin Ignis",
+  GoldenHorse: "Golden Horse",
+  BOSS_GoldenHorse: "Golden Horse",
+  Gorilla: "Gorirat",
+  BOSS_Gorilla: "Gorirat",
+  GrassDragon: "Grass Dragon",
+  BOSS_GrassDragon: "Grass Dragon",
+  NaughtyCat: "Grintale",
+  BOSS_NaughtyCat: "Grintale",
+  ElecPanda: "Grizzbolt",
+  BOSS_ElecPanda: "Grizzbolt",
+  GuardianDog: "Guardian Dog",
+  BOSS_GuardianDog: "Guardian Dog",
+  PlantSlime_Flower: "Gumoss",
+  PlantSlime: "Gumoss",
+  BOSS_PlantSlime_Flower: "Gumoss",
+  BOSS_PlantSlime: "Gumoss",
+  WindChimes: "Hangyu",
+  BOSS_WindChimes: "Hangyu",
+  WindChimes_Ice: "Hangyu Cryst",
+  BOSS_WindChimes_Ice: "Hangyu Cryst",
+  HadesBird: "Helzephyr",
+  BOSS_HadesBird: "Helzephyr",
+  WizardOwl: "Hoocrates",
+  BOSS_WizardOwl: "Hoocrates",
+  KingAlpaca_Ice: "Ice Kingpaca",
+  BOSS_KingAlpaca_Ice: "Ice Kingpaca",
+  VolcanicMonster_Ice: "Ice Reptyro",
+  BOSS_VolcanicMonster_Ice: "Ice Reptyro",
+  Baphomet: "Incineram",
+  BOSS_Baphomet: "Incineram",
+  Baphomet_Dark: "Incineram Noct",
+  BOSS_Baphomet_Dark: "Incineram Noct",
+  JetDragon: "Jetragon",
+  BOSS_JetDragon: "Jetragon",
+  Hedgehog: "Jolthog",
+  BOSS_Hedgehog: "Jolthog",
+  Hedgehog_Ice: "Jolthog Cryst",
+  BOSS_Hedgehog_Ice: "Jolthog Cryst",
+  Umihebi: "Jormuntide",
+  BOSS_Umihebi: "Jormuntide",
+  Umihebi_Fire: "Jormuntide Ignis",
+  BOSS_Umihebi_Fire: "Jormuntide Ignis",
+  CatMage: "Katress",
+  BOSS_CatMage: "Katress",
+  Kelpie: "Kelpsea",
+  BOSS_Kelpie: "Kelpsea",
+  Kelpie_Fire: "Kelpsea Ignis",
+  BOSS_Kelpie_Fire: "Kelpsea Ignis",
+  NegativeOctopus: "Killamari",
+  BOSS_NegativeOctopus: "Killamari",
+  KingAlpaca: "Kingpaca",
+  BOSS_KingAlpaca: "Kingpaca",
+  AmaterasuWolf: "Kitsun",
+  BOSS_AmaterasuWolf: "Kitsun",
+  SheepBall: "Lamball",
+  Sheepball: "Lamball",
+  BOSS_SheepBall: "Lamball",
+  BOSS_Sheepball: "Lamball",
+  LizardMan: "Leezpunk",
+  BOSS_LizardMan: "Leezpunk",
+  LizardMan_Fire: "Leezpunk Ignis",
+  BOSS_LizardMan_Fire: "Leezpunk Ignis",
+  Carbunclo: "Lifmunk",
+  BOSS_Carbunclo: "Lifmunk",
+  GYM_LilyQueen: "Lily & Lyleen",
+  Werewolf: "Loupmoon",
+  BOSS_Werewolf: "Loupmoon",
+  PinkLizard: "Lovander",
+  BOSS_PinkLizard: "Lovander",
+  Mutant: "Lunaris",
+  BOSS_Mutant: "Lunaris",
+  LilyQueen: "Lyleen",
+  BOSS_LilyQueen: "Lyleen",
+  LilyQueen_Dark: "Lyleen Noct",
+  BOSS_LilyQueen_Dark: "Lyleen Noct",
+  GrassMammoth: "Mammorest",
+  BOSS_GrassMammoth: "Mammorest",
+  GrassMammoth_Ice: "Mammorest Cryst",
+  BOSS_GrassMammoth_Ice: "Mammorest Cryst",
+  GhostBeast: "Maraith",
+  BOSS_GhostBeast: "Maraith",
+  GYM_Horus: "Marcus & Faleris",
+  Bastet: "Mau",
+  BOSS_Bastet: "Mau",
+  Bastet_Ice: "Mau Cryst",
+  BOSS_Bastet_Ice: "Mau Cryst",
+  Alpaca: "Melpaca",
+  BOSS_Alpaca: "Melpaca",
+  DarkScorpion: "Menasting",
+  BOSS_DarkScorpion: "Menasting",
+  GrassPanda: "Mossanda",
+  BOSS_GrassPanda: "Mossanda",
+  GrassPanda_Electric: "Mossanda Lux",
+  BOSS_GrassPanda_Electric: "Mossanda Lux",
+  CowPal: "Mozzarina",
+  BOSS_CowPal: "Mozzarina",
+  BlackCentaur: "Necromus",
+  BOSS_BlackCentaur: "Necromus",
+  HawkBird: "Nitewing",
+  BOSS_HawkBird: "Nitewing",
+  NightFox: "Nox",
+  BOSS_NightFox: "Nox",
+  ThunderDragonMan: "Orserk",
+  BOSS_ThunderDragonMan: "Orserk",
+  SaintCentaur: "Paladius",
+  BOSS_SaintCentaur: "Paladius",
+  Penguin: "Pengullet",
+  BOSS_Penguin: "Pengullet",
+  CaptainPenguin: "Penking",
+  BOSS_CaptainPenguin: "Penking",
+  FlowerDoll: "Petallia",
+  BOSS_FlowerDoll: "Petallia",
+  PinkKangaroo: "Pink Kangaroo",
+  BOSS_PinkKangaroo: "Pink Kangaroo",
+  FireKirin: "Pyrin",
+  BOSS_FireKirin: "Pyrin",
+  FireKirin_Dark: "Pyrin Noct",
+  BOSS_FireKirin_Dark: "Pyrin Noct",
+  SkyDragon: "Quivern",
+  BOSS_SkyDragon: "Quivern",
+  RedArmorBird: "Ragnahawk",
+  BOSS_RedArmorBird: "Ragnahawk",
+  ThunderDog: "Rayhound",
+  BOSS_ThunderDog: "Rayhound",
+  IceDeer: "Reindrix",
+  BOSS_IceDeer: "Reindrix",
+  LazyDragon: "Relaxaurus",
+  BOSS_LazyDragon: "Relaxaurus",
+  LazyDragon_Electric: "Relaxaurus Lux",
+  BOSS_LazyDragon_Electric: "Relaxaurus Lux",
+  VolcanicMonster: "Reptyro",
+  BOSS_VolcanicMonster: "Reptyro",
+  PinkRabbit: "Ribbuny",
+  BOSS_PinkRabbit: "Ribbuny",
+  RobinHood: "Robinquill",
+  BOSS_RobinHood: "Robinquill",
+  RobinHood_Ground: "Robinquill Terra",
+  BOSS_RobinHood_Ground: "Robinquill Terra",
+  FlameBambi: "Rooby",
+  BOSS_FlameBambi: "Rooby",
+  Boar: "Rushoar",
+  BOSS_Boar: "Rushoar",
+  ScorpionMan: "Scorpion Man",
+  BOSS_ScorpionMan: "Scorpion Man",
+  BlackGriffon: "Shadowbeak",
+  BOSS_BlackGriffon: "Shadowbeak",
+  WhiteMoth: "Sibelyx",
+  BOSS_WhiteMoth: "Sibelyx",
+  SifuDog: "Sifu Dog",
+  BOSS_SifuDog: "Sifu Dog",
+  ElecCat: "Sparkit",
+  BOSS_ElecCat: "Sparkit",
+  Serpent: "Surfent",
+  BOSS_Serpent: "Surfent",
+  Serpent_Ground: "Surfent Terra",
+  BOSS_Serpent_Ground: "Surfent Terra",
+  Suzaku: "Suzaku",
+  BOSS_Suzaku: "Suzaku",
+  Suzaku_Water: "Suzaku Aqua",
+  BOSS_Suzaku_Water: "Suzaku Aqua",
+  MopBaby: "Swee",
+  BOSS_MopBaby: "Swee",
+  MopKing: "Sweepa",
+  BOSS_MopKing: "Sweepa",
+  Monkey: "Tanzee",
+  BOSS_Monkey: "Tanzee",
+  Ganesha: "Teafant",
+  BOSS_Ganesha: "Teafant",
+  TentacleTurtle: "Tentacle Turtle",
+  BOSS_TentacleTurtle: "Tentacle Turtle",
+  ColorfulBird: "Tocotoco",
+  BOSS_ColorfulBird: "Tocotoco",
+  CatBat: "Tombat",
+  BOSS_CatBat: "Tombat",
+  Kirin: "Univolt",
+  BOSS_Kirin: "Univolt",
+  VioletFairy: "Vaelet",
+  BOSS_VioletFairy: "Vaelet",
+  BirdDragon: "Vanwyrm",
+  BOSS_BirdDragon: "Vanwyrm",
+  BirdDragon_Ice: "Vanwyrm Cryst",
+  BOSS_BirdDragon_Ice: "Vanwyrm Cryst",
+  GrassRabbitMan: "Verdash",
+  BOSS_GrassRabbitMan: "Verdash",
+  GYM_BlackGriffon: "Victor & Shadowbeak",
+  CuteFox: "Vixy",
+  BOSS_CuteFox: "Vixy",
+  HerculesBeetle: "Warsect",
+  BOSS_HerculesBeetle: "Warsect",
+  WaterLizard: "Water Lizard",
+  BOSS_WaterLizard: "Water Lizard",
+  WingGolem: "Wing Golem",
+  BOSS_WingGolem: "Wing Golem",
+  FoxMage: "Wixen",
+  BOSS_FoxMage: "Wixen",
+  SweetsSheep: "Woolipop",
+  BOSS_SweetsSheep: "Woolipop",
+  Yeti: "Wumpo",
+  BOSS_Yeti: "Wumpo",
+  Yeti_Grass: "Wumpo Botan",
+  BOSS_Yeti_Grass: "Wumpo Botan",
+  GYM_ElecPanda: "Zoe & Grizzbolt"
+};
+
+let PassiveSkillToTraitName = {
+  ElementResist_Normal_1_PAL: "Abnormal",
+  ElementResist_Dark_1_PAL: "Cheery",
+  ElementResist_Dragon_1_PAL: "Dragonkiller",
+  ElementResist_Ice_1_PAL: "Heated Body",
+  ElementResist_Fire_1_PAL: "Suntan Lover",
+  ElementResist_Leaf_1_PAL: "Botanical Barrier",
+  ElementResist_Earth_1_PAL: "Earthquake Resistant",
+  ElementResist_Thunder_1_PAL: "Insulated Body",
+  ElementResist_Aqua_1_PAL: "Waterproof",
+  ElementBoost_Normal_1_PAL: "Zen Mind",
+  ElementBoost_Dark_1_PAL: "Veil of Darkness",
+  ElementBoost_Dragon_1_PAL: "Blood of the Dragon",
+  ElementBoost_Ice_1_PAL: "Coldblooded",
+  ElementBoost_Fire_1_PAL: "Pyromaniac",
+  ElementBoost_Leaf_1_PAL: "Fragrant Foliage",
+  ElementBoost_Earth_1_PAL: "Power of Gaia",
+  ElementBoost_Thunder_1_PAL: "Capacitor",
+  ElementBoost_Aqua_1_PAL: "Hydromaniac",
+  ElementBoost_Normal_2_PAL: "Celestial Emperor",
+  ElementBoost_Dark_2_PAL: "Lord of the Underworld",
+  ElementBoost_Dragon_2_PAL: "Divine Dragon",
+  ElementBoost_Ice_2_PAL: "Ice Emperor",
+  ElementBoost_Fire_2_PAL: "Flame Emperor",
+  ElementBoost_Leaf_2_PAL: "Spirit Emperor",
+  ElementBoost_Earth_2_PAL: "Earth Emperor",
+  ElementBoost_Thunder_2_PAL: "Lord of Lightning",
+  ElementBoost_Aqua_2_PAL: "Lord of the Sea",
+  PAL_ALLAttack_up1: "Brave",
+  PAL_ALLAttack_up2: "Ferocious",
+  PAL_ALLAttack_down1: "Coward",
+  PAL_ALLAttack_down2: "Pacifist",
+  Deffence_up1: "Hard Skin",
+  Deffence_up2: "Burly Body",
+  Deffence_down1: "Downtrodden",
+  Deffence_down2: "Brittle",
+  TrainerMining_up1: "Mine Foreman",
+  TrainerLogging_up1: "Logging Foreman",
+  TrainerATK_UP_1: "Vanguard",
+  TrainerWorkSpeed_UP_1: "Motivational Leader",
+  TrainerDEF_UP_1: "Stronghold Strategist",
+  PAL_Sanity_Down_1: "Positive Thinker",
+  PAL_Sanity_Down_2: "Workaholic",
+  PAL_Sanity_Up_1: "Unstable",
+  PAL_Sanity_Up_2: "Destructive",
+  PAL_FullStomach_Down_1: "Dainty Eater",
+  PAL_FullStomach_Down_2: "Diet Lover",
+  PAL_FullStomach_Up_1: "Glutton",
+  PAL_FullStomach_Up_2: "Bottomless Stomach",
+  CraftSpeed_up1: "Serious",
+  CraftSpeed_up2: "Artisan",
+  CraftSpeed_down1: "Clumsy",
+  CraftSpeed_down2: "Slacker",
+  MoveSpeed_up_1: "Nimble",
+  MoveSpeed_up_2: "Runner",
+  MoveSpeed_up_3: "Swift",
+  PAL_CorporateSlave: "Work Slave",
+  PAL_rude: "Hooligan",
+  Noukin: "Musclehead",
+  PAL_oraora: "Aggressive",
+  PAL_conceited: "Conceited",
+  PAL_masochist: "Masochist",
+  PAL_sadist: "Sadist",
+  Rare: "Lucky",
+  Legend: "Legend"
+};
+
+let dropZone = document.body;
+
+dropZone.addEventListener('dragover', function (e) {
+  e.stopPropagation();
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+});
+
+dropZone.addEventListener('drop', function (e) {
+  e.stopPropagation();
+  e.preventDefault();
+
+  let files = e.dataTransfer.files; // Array of all files
+
+  for (let i = 0, file; file = files[i]; i++) {
+    let reader = new FileReader();
+
+    reader.onload = function (e) {
+      let contents = e.target.result;
+      let extracted = PalworldSavExtractCharacters(contents);
+      console.log('Extracted characters', extracted);
+      pals = [];
+      for (let e of extracted) {
+        try {
+          if (typeof e.CharacterID === 'undefined') {
+            continue;
+          }
+          let name = CharacterIDToIDName[e.CharacterID];
+          let id = EncodeIDName[name];
+          if (typeof id === 'undefined') {
+            console.log('Unknown CharacterID', e.CharacterID, name, id);
+            continue;
+          }
+          let skill_list = e.PassiveSkillList || [];
+          let pal = new Pal(
+            id,
+            EncodeGender[e.Gender],
+            EncodeTrait[PassiveSkillToTraitName[skill_list[0]]],
+            EncodeTrait[PassiveSkillToTraitName[skill_list[1]]],
+            EncodeTrait[PassiveSkillToTraitName[skill_list[2]]],
+            EncodeTrait[PassiveSkillToTraitName[skill_list[3]]],
+          );
+          pals.push(pal);
+        } catch (ex) {
+          console.error(ex, e);
+        }
+      }
+      localStorage.pals = JSON.stringify(pals);
+      PalsToTable();
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+});
+
 let rooster = [];
 function RoosterFromCpp() {
   // First get size from `uint32_t RoosterSize()`
@@ -155,12 +607,21 @@ function Main() {
     metric_buttons.appendChild(metric_btn);
   }
 
-  // Fetch the list of pals from C++ side
+  // Fetch the list of pals & traits from C++ side
   let id_count = Module.ccall('IDCount', 'number', [], []);
-  IDName = Module.cwrap('IDName', 'string', ['number']);
-  // Fetch the list of traits from C++ side
   let trait_count = Module.ccall('TraitCount', 'number', [], []);
+
+  IDName = Module.cwrap('IDName', 'string', ['number']);
   TraitName = Module.cwrap('TraitName', 'string', ['number']);
+
+  for (let i = 0; i < id_count; i++) {
+    EncodeIDName[IDName(i)] = i;
+  }
+
+  for (let i = 0; i < trait_count; i++) {
+    EncodeTrait[TraitName(i)] = i;
+  }
+
   // Prepare the form for adding new pals
   // Add the id selection
   let id_select = document.createElement('select');

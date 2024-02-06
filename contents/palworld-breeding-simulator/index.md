@@ -12,7 +12,7 @@ thumb: thumb.png
 
 <p>This website uses the Palworld breeding logic to find the best possible pals that can be obtained from a given initial Pal population.</p>
 
-<p>First enter the Pals that you have caught. This is the initial population that will be bred together to create stronger Pals. You can do this using the form at the bottom of the table or by drag & dropping the <code>Levels.sav</code> file from <code style="white-space:normal">C:\Users\&lt;Your Username&gt;\AppData\Local\Pal\Saved\SaveGames\&lt;Save Directory&gt;\</code> <button onclick="CopyPath()">Copy Path</button> into this page.</p>
+<p>First enter the Pals that you have caught. This is the initial population that will be bred together to create stronger Pals. You can either use the form at the bottom of the table or drag & dropp the <code>Level.sav</code> file from <code style="white-space:normal">C:\Users\&lt;Your Username&gt;\AppData\Local\Pal\Saved\SaveGames\&lt;Save Directory&gt;\</code> <button onclick="CopyPath()">Copy path to clipboard</button> into this page.</p>
 
 <p>Once you're ready to start the search, click one of the buttons below the table.</p>
 

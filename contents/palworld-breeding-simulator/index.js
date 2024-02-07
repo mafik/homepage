@@ -586,6 +586,116 @@ simulator.appendChild(document.createElement('hr'));
 let metric_buttons = document.createElement('div');
 simulator.appendChild(metric_buttons);
 
+let advanced_search = document.createElement('details');
+simulator.appendChild(advanced_search);
+
+let advanced_search_summary = document.createElement('summary');
+advanced_search_summary.appendChild(document.createTextNode('Advanced Search'));
+advanced_search.appendChild(advanced_search_summary);
+let AddParagraph = (text) => {
+  let p = document.createElement('p');
+  p.appendChild(document.createTextNode(text));
+  advanced_search.appendChild(p);
+};
+AddParagraph('Use this form to specify a custom scoring function in JavasScript. The "Score" function should return a number, where higher numbers are better.');
+AddParagraph('This can be used for example to search for specific Pals, trait combinations or pretty much any objective you can come up with.');
+AddParagraph('Clear the textarea and refresh the page to reset to the default scoring function.');
+let tracked_traits_p = document.createElement('p');
+advanced_search.appendChild(tracked_traits_p);
+tracked_traits_p.appendChild(document.createTextNode('Tracked traits: '));
+
+let advanced_trait_selects = [];
+function SaveAdvancedTraitSelects() {
+  localStorage.advanced_trait_selects = JSON.stringify(advanced_trait_selects.map((x) => x.value));
+}
+function RestoreAdvancedTraitSelects() {
+  if ('advanced_trait_selects' in localStorage) {
+    let values = JSON.parse(localStorage.advanced_trait_selects);
+    for (let i = 0; i < advanced_trait_selects.length; i++) {
+      advanced_trait_selects[i].value = values[i];
+    }
+  }
+}
+for (let t = 1; t <= 4; ++t) {
+  let trait_select = document.createElement('select');
+  trait_select.id = `t${t}`;
+  tracked_traits_p.appendChild(trait_select);
+  advanced_trait_selects.push(trait_select);
+  trait_select.onchange = SaveAdvancedTraitSelects;
+}
+let advanced_search_score_textarea = document.createElement('textarea');
+let advanced_search_error = document.createElement('pre');
+advanced_search_error.style.display = 'none';
+
+advanced_search_score_textarea.cols = 80;
+advanced_search_score_textarea.rows = 15;
+advanced_search_score_textarea.textContent = `function Score(name, gender,
+                          has_trait_1, has_trait_2, has_trait_3, has_trait_4,
+                          type1, type2,
+                          flying, nocturnal,
+                          kindling, watering, planting, electric,
+                          handiwork, gathering, lumbering, mining,
+                          medicine, cooling, transporting, farming,
+                          food_requirement, hp, melee, shot, defence, stamina,
+                          mount_speed, transport_speed,
+                          speed_multiplier, work_speed_multiplier, hunger_multiplier, sanity_multiplier) {
+  // Press F12 and click "Search" to inspect the values of arguments
+  debugger;
+  let score = 0.0;
+  if (name === 'Lifmunk') score += 1;
+  if (has_trait_1) score *= 2;
+  if (has_trait_2) score *= 2;
+  if (has_trait_3) score *= 2;
+  if (has_trait_4) score *= 2;
+  return score;
+}`;
+if ('advanced_search_score' in localStorage && localStorage.advanced_search_score.length > 0) {
+  advanced_search_score_textarea.value = localStorage.advanced_search_score;
+}
+advanced_search_score_textarea.onchange = function () {
+  localStorage.advanced_search_score = advanced_search_score_textarea.value;
+  try {
+    eval?.(advanced_search_score_textarea.value);
+    Score(
+      "Error Checker",
+      "M",
+      true, true, true, true,
+      "Normal", "Fire",
+      true,
+      true,
+      1, 1, 1, 1,
+      1, 1, 1, 1,
+      1, 1, 1, 1,
+      5,
+      50, 50, 50, 50, 50,
+      1000, 900,
+      1.5, 1.5, 0.8, 1.2);
+    advanced_search_error.textContent = '';
+    advanced_search_error.style.display = 'none';
+  } catch (ex) {
+    advanced_search_error.textContent = ex;
+    console.error(ex);
+    advanced_search_error.style.display = 'block';
+  }
+};
+advanced_search_score_textarea.onchange();
+advanced_search.appendChild(advanced_search_score_textarea);
+advanced_search.appendChild(advanced_search_error);
+advanced_search.appendChild(document.createElement('br'));
+let advanced_search_button = document.createElement('button');
+advanced_search_button.appendChild(document.createTextNode('Search'));
+advanced_search_button.onclick = function () {
+  best_pals_div.innerHTML = `Advanced search...`;
+  progress = document.createElement('progress');
+  best_pals_div.appendChild(progress);
+  PalsToCpp();
+  Module.ccall('BreedAdvanced', 'void',
+    ['number', 'number', 'number', 'number'],
+    [advanced_trait_selects[0].value, advanced_trait_selects[1].value, advanced_trait_selects[2].value, advanced_trait_selects[3].value]);
+  setTimeout(BreedStep, 0);
+};
+advanced_search.appendChild(advanced_search_button);
+
 simulator.appendChild(document.createElement('hr'));
 
 let best_pals_div = document.createElement('div');
@@ -621,6 +731,17 @@ function Main() {
   for (let i = 0; i < trait_count; i++) {
     EncodeTrait[TraitName(i)] = i;
   }
+
+  for (let trait_select of advanced_trait_selects) {
+    for (let i = 0; i < trait_count; i++) {
+      let option = document.createElement('option');
+      option.value = i;
+      option.text = TraitName(i);
+      trait_select.appendChild(option);
+    }
+  }
+  RestoreAdvancedTraitSelects();
+
 
   // Prepare the form for adding new pals
   // Add the id selection

@@ -50,9 +50,11 @@ def render_nav():
       <ul class="articles">{list_html}</ul>
       <hr>
       <ul>
-        <li><a href="https://github.com/mafik/">GitHub: @mafik</a></li>
-        <li><a href="https://101010.pl/@maf" rel="me">Mastodon: @maf@101010.pl</a></li>
         <li><a href="mailto:mafikpl@gmail.com">Email: mafikpl@gmail.com</a></li>
+        <li><a href="https://github.com/mafik/">GitHub: @mafik</a></li>
+        <li><a href="https://szmer.info/u/maf">Lemmy: @maf@szmer.info</a></li>
+        <li><a href="https://101010.pl/@maf" rel="me">Mastodon: @maf@101010.pl</a></li>
+        <li><a href="https://twitter.com/mafikpl">Twitter: @mafikpl</a></li>
       </ul>
     </nav>'''
 

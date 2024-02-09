@@ -20,71 +20,28 @@ thumb: thumb.png
 
 <p><small>Sources for this website (C++) can be downloaded from <a href="src.zip">here</a>. They were meant as throwaway code so they might be a little messy!</small></p>
 
-<div id="simulator">
 <style>
+.pal {
+  display: inline-block;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid #961b82;
+  border-radius: 5px;
+  background: #f7e8f3;
+  box-shadow: 0 5px 10px rgba(132, 30, 120, 0.5);
+}
 
-    table {
-      border: 1px solid black;
-      text-align: left;
-      box-shadow: 0 5px 10px rgba(90, 91, 127, 0.5);
-      background: #eee;
-      cursor: default;
-      border-collapse: collapse;
-    }
-
-    table th {
-      background: #ddd;
-    }
-
-    table td,
-    table th {
-      border: 1px solid #aaa;
-    }
-
-    table button {
-      cursor: pointer !important;
-    }
-
-
-    details summary {
-      cursor: pointer;
-      margin-bottom: 0px;
-      /* for more prominent move */
-      transition: margin 150ms ease-out;
-    }
-
-    details summary:hover {
-      background: #f0f0f0;
-    }
-
-    details[open] summary {
-      margin-bottom: 10px;
-    }
-
-    .pal {
-      display: inline-block;
-      margin: 5px;
-      padding: 5px;
-      border: 1px solid #961b82;
-      border-radius: 5px;
-      background: #f7e8f3;
-      box-shadow: 0 5px 10px rgba(132, 30, 120, 0.5);
-    }
-
-    .trait {
-      border: 1px solid #786221;
-      background: #f5e1a4;
-      border-radius: 5px;
-      padding: 1px 2px;
-      margin: 1px;
-      display: inline-block;
-    }
-
-    article {
-      max-width: none !important;
-    }
+.trait {
+  border: 1px solid #786221;
+  background: #f5e1a4;
+  border-radius: 5px;
+  padding: 1px 2px;
+  margin: 1px;
+  display: inline-block;
+}
 </style>
-</div>
+
+<div class="scroll-wide"><table id="pals"></table></div>
 
 <script>
 function CopyPath() {

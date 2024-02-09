@@ -44,12 +44,12 @@ def render_nav():
         except AttributeError:
             raise Exception(f"Article {article.path} is missing some of the required fields: title_pl, title_en, desc_pl, desc_en, date")
     return f'''<nav>
-      <h1 lang="pl"><a href="/" style="color:black" title="{TITLE_PL}">{TITLE_PL}</a></h1>
-      <h1 lang="en"><a href="/" style="color:black" title="{TITLE_EN}">{TITLE_EN}</a></h1>
-      <div><img class="lang" src="/lang.png" title="Language PL/EN"><a rel="home" href="https://mrogalski.eu/feed.xml" type="application/rss+xml" title="RSS"><img class="rss" alt="RSS" src="data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIg0KICAgICBpZD0iUlNTaWNvbiINCiAgICAgdmlld0JveD0iMCAwIDggOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiPg0KDQogIDx0aXRsZT5SU1MgZmVlZCBpY29uPC90aXRsZT4NCg0KICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KICAgIC5idXR0b24ge3N0cm9rZTogbm9uZTsgZmlsbDogb3JhbmdlO30NCiAgICAuc3ltYm9sIHtzdHJva2U6IG5vbmU7IGZpbGw6IHdoaXRlO30NCiAgPC9zdHlsZT4NCg0KICA8cmVjdCAgIGNsYXNzPSJidXR0b24iIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHJ4PSIxLjUiIC8+DQogIDxjaXJjbGUgY2xhc3M9InN5bWJvbCIgY3g9IjIiIGN5PSI2IiByPSIxIiAvPg0KICA8cGF0aCAgIGNsYXNzPSJzeW1ib2wiIGQ9Im0gMSw0IGEgMywzIDAgMCAxIDMsMyBoIDEgYSA0LDQgMCAwIDAgLTQsLTQgeiIgLz4NCiAgPHBhdGggICBjbGFzcz0ic3ltYm9sIiBkPSJtIDEsMiBhIDUsNSAwIDAgMSA1LDUgaCAxIGEgNiw2IDAgMCAwIC02LC02IHoiIC8+DQoNCjwvc3ZnPg=="></a></div>
+      <h1 lang="pl"><a href="/" title="{TITLE_PL}">{TITLE_PL}</a></h1>
+      <h1 lang="en"><a href="/" title="{TITLE_EN}">{TITLE_EN}</a></h1>
+      <div class="options"><img class="lang" src="/lang.png" title="Language PL/EN"><a rel="home" href="https://mrogalski.eu/feed.xml" type="application/rss+xml" title="RSS"><img class="rss" alt="RSS" src="data:image/svg+xml;charset=utf-8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIg0KICAgICBpZD0iUlNTaWNvbiINCiAgICAgdmlld0JveD0iMCAwIDggOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiPg0KDQogIDx0aXRsZT5SU1MgZmVlZCBpY29uPC90aXRsZT4NCg0KICA8c3R5bGUgdHlwZT0idGV4dC9jc3MiPg0KICAgIC5idXR0b24ge3N0cm9rZTogbm9uZTsgZmlsbDogb3JhbmdlO30NCiAgICAuc3ltYm9sIHtzdHJva2U6IG5vbmU7IGZpbGw6IHdoaXRlO30NCiAgPC9zdHlsZT4NCg0KICA8cmVjdCAgIGNsYXNzPSJidXR0b24iIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHJ4PSIxLjUiIC8+DQogIDxjaXJjbGUgY2xhc3M9InN5bWJvbCIgY3g9IjIiIGN5PSI2IiByPSIxIiAvPg0KICA8cGF0aCAgIGNsYXNzPSJzeW1ib2wiIGQ9Im0gMSw0IGEgMywzIDAgMCAxIDMsMyBoIDEgYSA0LDQgMCAwIDAgLTQsLTQgeiIgLz4NCiAgPHBhdGggICBjbGFzcz0ic3ltYm9sIiBkPSJtIDEsMiBhIDUsNSAwIDAgMSA1LDUgaCAxIGEgNiw2IDAgMCAwIC02LC02IHoiIC8+DQoNCjwvc3ZnPg=="></a></div>
       <ul class="articles">{list_html}</ul>
       <hr>
-      <ul>
+      <ul class="social">
         <li><a href="mailto:mafikpl@gmail.com">Email: mafikpl@gmail.com</a></li>
         <li><a href="https://github.com/mafik/">GitHub: @mafik</a></li>
         <li><a href="https://szmer.info/u/maf">Lemmy: @maf@szmer.info</a></li>

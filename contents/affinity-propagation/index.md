@@ -18,5 +18,5 @@ thumb: thumb.jpg
   
 <p lang=en>Description of the algorithm can be found <a href="http://www.psi.toronto.edu/affinitypropagation/FreyDueckScience07.pdf">here</a>. My javascript implementation can be found <a href=script.js>here</a>.</p>
 
-<canvas style="background:#eee; width:100%; height:20em" id=fg></canvas>
+<canvas style="background:#eee; width:100%; height:20em; margin: 0 auto; display: block; max-width: 100%" id=fg></canvas>
 <script src="script.js"></script>

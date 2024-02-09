@@ -6,46 +6,38 @@ html {
 body {
   text-rendering: optimizeLegibility;
   display: flex;
-  margin: 0 2em;
-}
-
-nav {
-  flex: 0 0 13em;
-  padding: 0;
-}
-
-body.index nav {
-  text-align: center;
-  flex: 1 0 0;
-  margin: 0 10%;
-}
-
-body.index nav h1 {
-  font-size: 3em;
-}
-
-body.index nav .lang,
-body.index nav .rss {
-  height: 2em;
-  margin-bottom: 1em;
-}
-
-body.index nav li {
-  display: inline-block;
-  padding: .5em;
-  margin: .5em;
-}
-
-body.index nav ul.articles li {
-  background: #e9ecff;
-  border: 3px outset #f2f4ff;
-  border-radius: .5em;
+  margin: 0;
+  text-wrap: pretty;
 }
 
 article {
-  padding: 0 1em 8em;
-  min-width: 25em;
-  max-width: 50em;
+  width: 100%;
+  overflow: auto;
+}
+
+article>* {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 50rem;
+}
+
+article>img {
+  display: block;
+}
+
+.scroll-wide {
+  max-width: unset !important;
+  overflow: auto;
+}
+
+.scroll-wide>* {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+nav {
+  text-wrap: balance;
+  margin: 0 1em;
 }
 
 nav ul {
@@ -66,9 +58,7 @@ nav time {
   height: 1.5em;
   vertical-align: baseline;
   background: white;
-  opacity: .6;
   cursor: pointer;
-  transition: opacity .5s;
   border-radius: .2em;
 }
 
@@ -77,8 +67,19 @@ nav time {
   height: 1.5em;
 }
 
-.lang:hover {
+.lang,
+.rss {
+  transition: opacity .5s;
+  opacity: .6;
+}
+
+.lang:hover,
+.rss:hover {
   opacity: 1;
+}
+
+:root {
+  accent-color: red;
 }
 
 ::selection {
@@ -99,7 +100,8 @@ a:hover {
 }
 
 p {
-  margin: 1em 0;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 li {
@@ -107,7 +109,8 @@ li {
 }
 
 blockquote {
-  margin: 1.2em 1em;
+  margin-top: 1.2em;
+  margin-bottom: 1.2em;
   padding-left: 1em;
   border-left: 1em solid #ccc;
 }
@@ -116,7 +119,45 @@ hr {
   border: 0;
   border-top: 1px dashed #d2d2d2;
   height: 0;
-  margin: 1.6em 0;
+  margin-top: 1.6em;
+  margin-bottom: 1.6em;
+}
+
+table {
+  text-align: left;
+  box-shadow: 0 5px 10px rgba(15, 15, 22, 0.288);
+  background: #eee;
+  cursor: default;
+  border-collapse: collapse;
+}
+
+table th {
+  background: #ddd;
+}
+
+table td,
+table th {
+  border: 1px solid #aaa;
+}
+
+table button {
+  cursor: pointer !important;
+}
+
+
+details summary {
+  cursor: pointer;
+  margin-bottom: 0px;
+  /* for more prominent move */
+  transition: margin 150ms ease-out;
+}
+
+details summary:hover {
+  background: #f0f0f0;
+}
+
+details[open] summary {
+  margin-bottom: 10px;
 }
 
 .good {
@@ -132,7 +173,6 @@ textarea {
   font-family: inherit;
   font-weight: inherit;
   font-size: inherit;
-  border: 2px solid #ccc;
 }
 
 em {
@@ -143,13 +183,19 @@ strong {
   font-weight: 500;
 }
 
-pre {
+pre,
+textarea {
   font-family: "Fira Mono";
   overflow: auto;
   background: #eee;
   border: 1px dashed #ccc;
-  margin: 1.8em 0;
+  margin-top: 1.8em;
+  margin-bottom: 1.8em;
   padding: 1em;
+}
+
+h1 a:visited {
+  color: inherit;
 }
 
 p code,
@@ -161,5 +207,127 @@ dl code {
   border: 1px dashed #ccc;
   position: relative;
   top: -0.1em;
-  white-space: nowrap;
+  white-space: wrap;
+  word-break: break-word;
+}
+
+body.index {
+  nav {
+    text-align: center;
+    margin: 0 10%;
+  }
+
+  nav h1 {
+    font-size: 3em;
+  }
+
+  nav .lang,
+  nav .rss {
+    height: 2em;
+    margin-bottom: 1em;
+  }
+
+  nav li {
+    display: inline-block;
+    padding: .5em;
+    margin: .5em;
+  }
+
+  nav ul.articles li {
+    background: #e9ecff;
+    border: 3px outset #f2f4ff;
+    border-radius: .5em;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  body:not(.index) {
+    flex-direction: column;
+    gap: 0;
+
+    nav {
+      text-align: center;
+
+      .articles {
+        display: none;
+      }
+
+      .social {
+        display: none;
+      }
+
+      h1 {
+        margin-right: 2em;
+      }
+
+      .lang {
+        position: absolute;
+        top: 1.3em;
+        right: 1em;
+      }
+
+      .rss {
+        display: none;
+      }
+    }
+
+    article {
+      :first-child {
+        margin-top: 0;
+      }
+
+      >* {
+        margin-left: 1rem;
+        margin-right: 1rem;
+      }
+
+      >.scroll-wide {
+        margin-left: auto;
+        margin-right: auto;
+        padding: 1rem;
+      }
+    }
+  }
+}
+
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1b1210;
+    color: rgb(241, 230, 225);
+    color-scheme: dark;
+  }
+
+  a {
+    color: rgb(255 105 105);
+  }
+
+  a:hover {
+    color: rgb(255, 151, 151);
+  }
+
+  a:visited {
+    color: rgb(139, 84, 84);
+  }
+
+  pre,
+  p code,
+  ul code,
+  dl code {
+    background: #202020;
+    border-color: #3a3a3a;
+  }
+
+  table {
+    background-color: #202020;
+  }
+
+  table th {
+    background-color: #2e2d2d;
+  }
+
+  table td,
+  table th {
+    border-color: #3a3a3a;
+  }
 }

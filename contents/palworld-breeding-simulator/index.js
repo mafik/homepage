@@ -1,4 +1,4 @@
-let root = document.getElementById('simulator');
+let root = document.querySelector('article'); // document.getElementById('simulator');
 
 class Pal {
   constructor(id, gender, t0, t1, t2, t3) {
@@ -518,9 +518,7 @@ function BestPalsFromCpp() {
 }
 
 // Create the pals table
-let table = document.createElement('table');
-table.id = 'pals';
-simulator.appendChild(table);
+let table = document.getElementById('pals');
 // Create the header row
 let header = document.createElement('tr');
 table.appendChild(header);
@@ -581,13 +579,13 @@ function PalsToCpp() {
   }
 }
 
-simulator.appendChild(document.createElement('hr'));
+root.appendChild(document.createElement('hr'));
 
 let metric_buttons = document.createElement('div');
-simulator.appendChild(metric_buttons);
+root.appendChild(metric_buttons);
 
 let advanced_search = document.createElement('details');
-simulator.appendChild(advanced_search);
+root.appendChild(advanced_search);
 
 let advanced_search_summary = document.createElement('summary');
 advanced_search_summary.appendChild(document.createTextNode('Advanced Search'));
@@ -630,15 +628,15 @@ advanced_search_error.style.display = 'none';
 advanced_search_score_textarea.cols = 80;
 advanced_search_score_textarea.rows = 15;
 advanced_search_score_textarea.textContent = `function Score(name, gender,
-                          has_trait_1, has_trait_2, has_trait_3, has_trait_4,
-                          type1, type2,
-                          flying, nocturnal,
-                          kindling, watering, planting, electric,
-                          handiwork, gathering, lumbering, mining,
-                          medicine, cooling, transporting, farming,
-                          food_requirement, hp, melee, shot, defence, stamina,
-                          mount_speed, transport_speed,
-                          speed_multiplier, work_speed_multiplier, hunger_multiplier, sanity_multiplier) {
+               has_trait_1, has_trait_2, has_trait_3, has_trait_4,
+               type1, type2,
+               flying, nocturnal,
+               kindling, watering, planting, electric,
+               handiwork, gathering, lumbering, mining,
+               medicine, cooling, transporting, farming,
+               food_requirement, hp, melee, shot, defence, stamina,
+               mount_speed, transport_speed,
+               speed_multiplier, work_speed_multiplier, hunger_multiplier, sanity_multiplier) {
   // Press F12 and click "Search" to inspect the values of arguments
   debugger;
   let score = 0.0;
@@ -696,11 +694,11 @@ advanced_search_button.onclick = function () {
 };
 advanced_search.appendChild(advanced_search_button);
 
-simulator.appendChild(document.createElement('hr'));
+root.appendChild(document.createElement('hr'));
 
 let best_pals_div = document.createElement('div');
 best_pals_div.id = 'best_pals';
-simulator.appendChild(best_pals_div);
+root.appendChild(best_pals_div);
 
 let progress = null;
 

@@ -36,14 +36,14 @@ thumb: thumb.png
 <p lang=pl>Układ klawiszy bez modyfikatorów:</p>
 <p lang=en>Key layout without modifiers:</p>
 
-<a href="dvp.jpg"><img src="dvp.jpg" style="max-width: 100%"></a>
+<p><a href="dvp.jpg"><img src="dvp.jpg" style="max-width: 100%"></a></p>
 
 <p lang=pl>Układ klawiszy z prawym klawiszem Alt:</p>
 <p lang=en>Layout with the right Alt key:</p>
 
-<a href="dvpAltGr.jpg"><img src="dvpAltGr.jpg" style="max-width: 100%"></a>
+<p><a href="dvpAltGr.jpg"><img src="dvpAltGr.jpg" style="max-width: 100%"></a></p>
 
 <p lang=pl>Układ klawiszy z klawiszem Shift:</p>
 <p lang=en>Layout with the Shift key:</p>
 
-<a href="dvpShft.jpg"><img src="dvpShft.jpg" style="max-width: 100%"></a>
+<p><a href="dvpShft.jpg"><img src="dvpShft.jpg" style="max-width: 100%"></a></p>

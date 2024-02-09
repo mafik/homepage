@@ -4,14 +4,14 @@ html {
 }
 
 body {
-    text-rendering: optimizeLegibility;
-    display: flex;
-    margin: 0 2em;
+  text-rendering: optimizeLegibility;
+  display: flex;
+  margin: 0 2em;
 }
 
 nav {
-    flex: 0 0 13em;
-    padding: 0;
+  flex: 0 0 13em;
+  padding: 0;
 }
 
 body.index nav {
@@ -19,18 +19,23 @@ body.index nav {
   flex: 1 0 0;
   margin: 0 10%;
 }
+
 body.index nav h1 {
   font-size: 3em;
 }
-body.index nav .lang, body.index nav .rss {
+
+body.index nav .lang,
+body.index nav .rss {
   height: 2em;
   margin-bottom: 1em;
 }
+
 body.index nav li {
   display: inline-block;
   padding: .5em;
   margin: .5em;
 }
+
 body.index nav ul.articles li {
   background: #e9ecff;
   border: 3px outset #f2f4ff;
@@ -44,17 +49,17 @@ article {
 }
 
 nav ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 nav li {
-    margin-bottom: .5em;
+  margin-bottom: .5em;
 }
 
 nav time {
-    display: block;
-    color: #777;
+  display: block;
+  color: #777;
 }
 
 .lang {
@@ -73,20 +78,28 @@ nav time {
 }
 
 .lang:hover {
-    opacity: 1;
+  opacity: 1;
 }
 
 ::selection {
-    background: red;
-    color: white;
+  background: red;
+  color: white;
 }
 
-a { color: rgb(44, 65, 227); }
-a:visited { color: rgb(126, 60, 232); }
-a:hover { color: rgb(136, 154, 255); }
+a {
+  color: rgb(44, 65, 227);
+}
+
+a:visited {
+  color: rgb(126, 60, 232);
+}
+
+a:hover {
+  color: rgb(136, 154, 255);
+}
 
 p {
-    margin: 1em 0;
+  margin: 1em 0;
 }
 
 li {
@@ -114,7 +127,8 @@ hr {
   color: #d84745;
 }
 
-input, textarea {
+input,
+textarea {
   font-family: inherit;
   font-weight: inherit;
   font-size: inherit;
@@ -122,11 +136,11 @@ input, textarea {
 }
 
 em {
-    font-weight: 400;
+  font-weight: 400;
 }
 
 strong {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 pre {
@@ -138,7 +152,9 @@ pre {
   padding: 1em;
 }
 
-p code, ul code, dl code {
+p code,
+ul code,
+dl code {
   font-family: "Fira Mono";
   background: #eee;
   padding: 0 0.2em 0em;

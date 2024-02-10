@@ -13,6 +13,7 @@ body {
 article {
   width: 100%;
   overflow: auto;
+  margin-bottom: 8em;
 }
 
 article>* {
@@ -153,7 +154,7 @@ details summary {
 }
 
 details summary:hover {
-  background: #f0f0f0;
+  background: rgba(0.5, 0.5, 0.5, 0.2);
 }
 
 details[open] summary {
@@ -173,6 +174,12 @@ textarea {
   font-family: inherit;
   font-weight: inherit;
   font-size: inherit;
+}
+
+button,
+input,
+select {
+  margin: 1px;
 }
 
 em {
@@ -205,8 +212,6 @@ dl code {
   background: #eee;
   padding: 0 0.2em 0em;
   border: 1px dashed #ccc;
-  position: relative;
-  top: -0.1em;
   white-space: wrap;
   word-break: break-word;
 }
@@ -310,6 +315,7 @@ body.index {
     color: rgb(139, 84, 84);
   }
 
+  textarea,
   pre,
   p code,
   ul code,

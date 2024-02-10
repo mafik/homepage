@@ -39,9 +39,51 @@ thumb: thumb.png
   margin: 1px;
   display: inline-block;
 }
+
+@media (prefers-color-scheme: dark) {
+  .pal {
+    background: #2d2d2d;
+    border: 1px solid #5e5e5e;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+  }
+
+  .trait {
+    border: 1px solid #5e5e5e;
+    background: #3d3d3d;
+  }
+}
 </style>
 
-<div class="scroll-wide"><table id="pals"></table></div>
+<div class="scroll-wide"><table id="pals"><thead><tr><th>Name</th><th>Gender</th><th>Skill 1</th><th>Skill 2</th><th>Skill 3</th><th>Skill 4</th><th>Actions</th></tr></thead></table></div>
+
+<hr>
+
+<div id="metric-buttons"></div>
+
+<details><summary>Advanced Search</summary>
+<p>Use this form to specify a custom scoring function in JavasScript. The "Score" function should return a number, where higher numbers are better.</p>
+<p>This can be used for example to search for specific Pals, skill combinations or pretty much any objective you can come up with.</p>
+<p>Clear the textarea and refresh the page to reset to the default scoring function.</p>
+<p>Select the skills that you're interested in. Only the selected skills will be available in the <code>skills</code> variable:</p>
+<div id="skill-checkboxes" style="display: grid;grid: auto-flow / 2em 2fr 2em 2fr 2em 2fr;"></div>
+<p>WARNING: The algorithm gets significantly slower when more skills are tracked! Try not to exceed 4 skills.</p>
+<textarea cols=80 rows=15 id="advanced_search_score">function Score(name, gender, skills, stats) {
+  // Press F12 and click "Search" to inspect the values of arguments
+  debugger;
+  let score = 0.0;
+  if (name === 'Lifmunk') score += 1;
+  if ('Lucky' in skills) score *= 2;
+  if ('Dragonkiller' in skills) score *= 2;
+  return score;
+}
+</textarea>
+<pre id="advanced_search_error" style="display: none"></pre><br>
+<button onclick="AdvancedSearch()">Search</button>
+</details>
+
+<hr>
+
+<div id="best-pals"></div>
 
 <script>
 function CopyPath() {

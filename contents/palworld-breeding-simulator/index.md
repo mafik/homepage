@@ -65,7 +65,7 @@ thumb: thumb.png
 <p>This can be used for example to search for specific Pals, skill combinations or pretty much any objective you can come up with.</p>
 <p>Clear the textarea and refresh the page to reset to the default scoring function.</p>
 <p>Select the skills that you're interested in. Only the selected skills will be available in the <code>skills</code> variable:</p>
-<div id="skill-checkboxes" style="display: grid;grid: auto-flow / 2em 2fr 2em 2fr 2em 2fr;"></div>
+<div id="skill-checkboxes" style="display: grid;grid: auto-flow / 1em 1fr 1em 1fr 1em 1fr;align-items: center;"></div>
 <p>WARNING: The algorithm gets significantly slower when more skills are tracked! Try not to exceed 4 skills.</p>
 <textarea cols=80 rows=15 id="advanced_search_score">function Score(name, gender, skills, stats) {
   // Press F12 and click "Search" to inspect the values of arguments

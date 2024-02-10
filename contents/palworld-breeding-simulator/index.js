@@ -912,7 +912,8 @@ function ScoreMedicine(pal) { return Stats[pal.id].medicine * WorkSpeed(pal) * N
 function ScoreCooling(pal) { return Stats[pal.id].cooling * WorkSpeed(pal) * NightActivityMultiplier(pal); }
 
 function ScoreTransporting(pal) {
-  return Stats[pal.id].transporting * TransportSpeed[pal.id] *
+  let stats = Stats[pal.id];
+  return stats.transporting * stats.transport_speed *
     SpeedMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
@@ -998,17 +999,17 @@ function TypedAttackMetric(type, attack_traits) {
 }
 
 const Metrics = {
-  "<img width=20 src=kindling.png>": { score_fn: ScoreKindling, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=watering.png>": { score_fn: ScoreWatering, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=planting.png>": { score_fn: ScorePlanting, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=generatingElectricity.png>": { score_fn: ScoreElectric, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=handiwork.png>": { score_fn: ScoreHandiwork, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=gathering.png>": { score_fn: ScoreGathering, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=lumbering.png>": { score_fn: ScoreLumbering, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=mining.png>": { score_fn: ScoreMining, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=medicineProduction.png>": { score_fn: ScoreMedicine, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=cooling.png>": { score_fn: ScoreCooling, tracked_traits: TraitSelector(WorkSpeedTraits) },
-  "<img width=20 src=transporting.png>": { score_fn: ScoreTransporting, tracked_traits: TraitSelector(SpeedTraits) },
+  "<img width=20 src=kindling.png style=vertical-align:bottom>": { score_fn: ScoreKindling, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=watering.png style=vertical-align:bottom>": { score_fn: ScoreWatering, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=planting.png style=vertical-align:bottom>": { score_fn: ScorePlanting, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=generatingElectricity.png style=vertical-align:bottom>": { score_fn: ScoreElectric, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=handiwork.png style=vertical-align:bottom>": { score_fn: ScoreHandiwork, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=gathering.png style=vertical-align:bottom>": { score_fn: ScoreGathering, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=lumbering.png style=vertical-align:bottom>": { score_fn: ScoreLumbering, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=mining.png style=vertical-align:bottom>": { score_fn: ScoreMining, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=medicineProduction.png style=vertical-align:bottom>": { score_fn: ScoreMedicine, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=cooling.png style=vertical-align:bottom>": { score_fn: ScoreCooling, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=transporting.png style=vertical-align:bottom>": { score_fn: ScoreTransporting, tracked_traits: TraitSelector(SpeedTraits) },
   "Fastest 🐎": { score_fn: ScoreMount, tracked_traits: TraitSelector(SpeedTraits) },
   "Wool Farming 🐑": { score_fn: ScoreWool, tracked_traits: BestTraitsForFarming },
   "Eggs Farming 🥚": { score_fn: ScoreEggs, tracked_traits: BestTraitsForFarming },
@@ -1025,15 +1026,15 @@ const Metrics = {
       return Stats[pal.id].shot * AttackMultiplier(pal);
     }, tracked_traits: TraitSelector(AttackTraits)
   },
-  "<img width=24 src=normal.png>⚔️": TypedAttackMetric(Normal, NormalAttackTraits),
-  "<img width=24 src=dark.png>⚔️": TypedAttackMetric(Dark, DarkAttackTraits),
-  "<img width=24 src=dragon.png>⚔️": TypedAttackMetric(Dragon, DragonAttackTraits),
-  "<img width=24 src=ice.png>⚔️": TypedAttackMetric(Ice, IceAttackTraits),
-  "<img width=24 src=fire.png>⚔️": TypedAttackMetric(Fire, FireAttackTraits),
-  "<img width=24 src=water.png>⚔️": TypedAttackMetric(Water, WaterAttackTraits),
-  "<img width=24 src=electric.png>⚔️": TypedAttackMetric(Electricity, ElectricityAttackTraits),
-  "<img width=24 src=ground.png>⚔️": TypedAttackMetric(Earth, EarthAttackTraits),
-  "<img width=24 src=grass.png>⚔️": TypedAttackMetric(Leaf, GrassAttackTraits),
+  "<img width=24 src=normal.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Normal, NormalAttackTraits),
+  "<img width=24 src=dark.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Dark, DarkAttackTraits),
+  "<img width=24 src=dragon.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Dragon, DragonAttackTraits),
+  "<img width=24 src=ice.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Ice, IceAttackTraits),
+  "<img width=24 src=fire.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Fire, FireAttackTraits),
+  "<img width=24 src=water.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Water, WaterAttackTraits),
+  "<img width=24 src=electric.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Electricity, ElectricityAttackTraits),
+  "<img width=24 src=ground.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Earth, EarthAttackTraits),
+  "<img width=24 src=grass.png style=vertical-align:bottom>⚔️": TypedAttackMetric(Leaf, GrassAttackTraits),
 };
 
 let genders = ['♂', '♀'];
@@ -1667,7 +1668,7 @@ function AdvancedSearch() {
 
 function PredefinedSearch(metric_name) {
   let metric = Metrics[metric_name];
-  best_pals_div.innerHTML = `Finding best ${metric_name}...`;
+  best_pals_div.innerHTML = `Searching for ${metric_name}...`;
   progress = document.createElement('progress');
   best_pals_div.appendChild(progress);
   PalsToCpp();

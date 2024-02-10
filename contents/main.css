@@ -205,6 +205,10 @@ h1 a:visited {
   color: inherit;
 }
 
+button img {
+  vertical-align: bottom;
+}
+
 p code,
 ul code,
 dl code {

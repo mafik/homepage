@@ -2,160 +2,137 @@
 const TraitToStr = [
   "-",
   "Abnormal",
-  "Aggressive",
-  "Artisan",
-  "Brittle",
-  "Burly Body",
-  "Blood of the Dragon",
-  "Botanical Barrier",
-  "Bottomless Stomach",
-  "Brave",
-  "Capacitor",
   "Cheery",
-  "Clumsy",
+  "Dragonkiller",
+  "Heated Body",
+  "Suntan Lover",
+  "Botanical Barrier",
+  "Earthquake Resistant",
+  "Insulated Body",
+  "Waterproof",
+  "Zen Mind",
+  "Veil of Darkness",
+  "Blood of the Dragon",
   "Coldblooded",
+  "Pyromaniac",
+  "Fragrant Foliage",
+  "Power of Gaia",
+  "Capacitor",
+  "Hydromaniac",
+  "Celestial Emperor",
+  "Lord of the Underworld",
+  "Divine Dragon",
+  "Ice Emperor",
+  "Flame Emperor",
+  "Spirit Emperor",
+  "Earth Emperor",
+  "Lord of Lightning",
+  "Lord of the Sea",
+  "Brave",
+  "Ferocious",
   "Coward",
-  "Conceited",
+  "Pacifist",
+  "Hard Skin",
+  "Burly Body",
+  "Downtrodden",
+  "Brittle",
+  "Mine Foreman",
+  "Logging Foreman",
+  "Vanguard",
+  "Motivational Leader",
+  "Stronghold Strategist",
+  "Positive Thinker",
+  "Workaholic",
+  "Unstable",
+  "Destructive",
   "Dainty Eater",
   "Diet Lover",
-  "Destructive",
-  "Divine Dragon",
-  "Downtrodden",
-  "Dragonkiller",
-  "Earth Emperor",
-  "Earthquake Resistant",
-  "Ferocious",
-  "Fragrant Foliage",
   "Glutton",
-  "Hard Skin",
-  "Heated Body",
-  "Hooligan",
-  "Hydromaniac",
-  "Ice Emperor",
-  "Insulated Body",
-  "Legend",
-  "Logging Foreman",
-  "Lord of Darkness",
-  "Lord of the Sea",
-  "Lucky",
-  "Masochist",
-  "Mine Foreman",
-  "Motivational Leader",
-  "Musclehead",
-  "Nimble",
-  "Pacifist",
-  "Positive Thinker",
-  "Power of Gaia",
-  "Pyromaniac",
-  "Runner",
-  "Sadist",
+  "Bottomless Stomach",
   "Serious",
-  "Suntan Lover",
-  "Swift",
-  "Stronghold Strategist",
+  "Artisan",
+  "Clumsy",
   "Slacker",
-  "Unstable",
-  "Vanguard",
-  "Veil of Darkness",
-  "Waterproof",
-  "Workaholic",
+  "Nimble",
+  "Runner",
+  "Swift",
   "Work Slave",
-  "Zen Mind"
+  "Hooligan",
+  "Musclehead",
+  "Aggressive",
+  "Conceited",
+  "Masochist",
+  "Sadist",
+  "Lucky",
+  "Legend"
 ];
 
 const NoTrait = 0,
   Abnormal = 1,
-  Aggressive = 2,
-  Artisan = 3,
-  Brittle = 4,
-  BurlyBody = 5,
-  BloodOfTheDragon = 6,
-  BotanicalBarrier = 7,
-  BottomlessStomach = 8,
-  Brave = 9,
-  Capacitor = 10,
-  Cheery = 11,
-  Clumsy = 12,
+  Cheery = 2,
+  Dragonkiller = 3,
+  HeatedBody = 4,
+  SuntanLover = 5,
+  BotanicalBarrier = 6,
+  EarthquakeResistant = 7,
+  InsulatedBody = 8,
+  Waterproof = 9,
+  ZenMind = 10,
+  VeilOfDarkness = 11,
+  BloodOfTheDragon = 12,
   Coldblooded = 13,
-  Coward = 14,
-  Conceited = 15,
-  DaintyEater = 16,
-  DietLover = 17,
-  Destructive = 18,
-  DivineDragon = 19,
-  Downtrodden = 20,
-  Dragonkiller = 21,
-  EarthEmperor = 22,
-  EarthquakeResistant = 23,
-  Ferocious = 24,
-  FragrantFoliage = 25,
-  Glutton = 26,
-  HardSkin = 27,
-  HeatedBody = 28,
-  Hooligan = 29,
-  Hydromaniac = 30,
-  IceEmperor = 31,
-  InsulatedBody = 32,
-  Legend = 33,
-  LoggingForeman = 34,
-  LordOfDarkness = 35,
-  LordOfTheSea = 36,
-  Lucky = 37,
-  Masochist = 38,
-  MineForeman = 39,
-  MotivationalLeader = 40,
-  Musclehead = 41,
-  Nimble = 42,
-  Pacifist = 43,
-  PositiveThinker = 44,
-  PowerOfGaia = 45,
-  Pyromaniac = 46,
-  Runner = 47,
-  Sadist = 48,
+  Pyromaniac = 14,
+  FragrantFoliage = 15,
+  PowerOfGaia = 16,
+  Capacitor = 17,
+  Hydromaniac = 18,
+  CelestialEmperor = 19,
+  LordOfTheUnderworld = 20,
+  DivineDragon = 21,
+  IceEmperor = 22,
+  FlameEmperor = 23,
+  SpiritEmperor = 24,
+  EarthEmperor = 25,
+  LordOfLightning = 26,
+  LordOfTheSea = 27,
+  Brave = 28,
+  Ferocious = 29,
+  Coward = 30,
+  Pacifist = 31,
+  HardSkin = 32,
+  BurlyBody = 33,
+  Downtrodden = 34,
+  Brittle = 35,
+  MineForeman = 36,
+  LoggingForeman = 37,
+  Vanguard = 38,
+  MotivationalLeader = 39,
+  StrongholdStrategist = 40,
+  PositiveThinker = 41,
+  Workaholic = 42,
+  Unstable = 43,
+  Destructive = 44,
+  DaintyEater = 45,
+  DietLover = 46,
+  Glutton = 47,
+  BottomlessStomach = 48,
   Serious = 49,
-  SuntanLover = 50,
-  Swift = 51,
-  StrongholdStrategist = 52,
-  Slacker = 53,
-  Unstable = 54,
-  Vanguard = 55,
-  VeilOfDarkness = 56,
-  Waterproof = 57,
-  Workaholic = 58,
-  WorkSlave = 59,
-  ZenMind = 60,
-  TraitCount = 61;
-
-const BestTraitsForWorker = [
-  Artisan,   // +50% work speed
-  WorkSlave, // +30% work speed
-  Serious,   // +20% work speed
-  Lucky,     // +15% work speed
-  Conceited, // +10% work speed
-];
-
-const BestTraitsForTransporting = [Swift, Runner, Legend, Nimble];
-
-const BestTraitsForMount = [
-  Swift,  // +30% speed
-  Runner, // +20% speed
-  Legend, // +15% speed
-  Nimble, // +10% speed
-];
-
-const BestTraitsForFarming = [
-  Workaholic,
-  PositiveThinker,
-  DietLover,
-  DaintyEater,
-];
-
-const BestTraitsForCombat = [
-  Legend,     // +20% attack/defense
-  Musclehead, // +30% attack
-  Ferocious,  // +20% attack
-  Lucky,      // +15% attack
-];
+  Artisan = 50,
+  Clumsy = 51,
+  Slacker = 52,
+  Nimble = 53,
+  Runner = 54,
+  Swift = 55,
+  WorkSlave = 56,
+  Hooligan = 57,
+  Musclehead = 58,
+  Aggressive = 59,
+  Conceited = 60,
+  Masochist = 61,
+  Sadist = 62,
+  Lucky = 63,
+  Legend = 64,
+  TraitCount = 65;
 
 // Define aliases for CharacterIDs
 const IDToStr = [
@@ -461,6 +438,9 @@ class Pal {
     Module.HEAPU8[ptr + 3] = pal.traits[1];
     Module.HEAPU8[ptr + 4] = pal.traits[2];
     Module.HEAPU8[ptr + 5] = pal.traits[3];
+  }
+  static HasType(pal, type) {
+    return Stats[pal.id].type1 === type || Stats[pal.id].type2 === type;
   }
 }
 
@@ -782,6 +762,26 @@ function Multiplier(pal, traits_array) {
   return multiplier;
 }
 
+function TopSkillsFromRooster(trait_array) {
+  let rooster_skills = new Set();
+  for (let pal of pals) {
+    for (let skill of pal.traits) {
+      rooster_skills.add(Number(skill));
+    }
+  }
+  rooster_skills.delete(NoType);
+  let top_skills = [];
+  for (let skill of rooster_skills) {
+    if (trait_array[skill] > 0)
+      top_skills.push(skill);
+  }
+  top_skills.sort((a, b) => trait_array[b] - trait_array[a]);
+  if (top_skills.length > 4) {
+    top_skills.length = 4;
+  }
+  return top_skills;
+}
+
 let SpeedTraits = new Float32Array(TraitCount);
 SpeedTraits[Swift] = 0.3;
 SpeedTraits[Runner] = 0.2;
@@ -811,6 +811,56 @@ SanityTraits[Unstable] = -0.1;
 SanityTraits[PositiveThinker] = 0.1;
 SanityTraits[Workaholic] = 0.15;
 
+let AttackTraits = new Float32Array(TraitCount);
+AttackTraits[Brave] = 0.1;
+AttackTraits[Coward] = -0.1;
+AttackTraits[Pacifist] = -0.2;
+AttackTraits[Lucky] = 0.15;
+AttackTraits[Sadist] = 0.15;
+AttackTraits[Aggressive] = 0.1;
+AttackTraits[Musclehead] = 0.3;
+AttackTraits[Hooligan] = 0.15;
+AttackTraits[Ferocious] = 0.2;
+AttackTraits[Masochist] = -0.15;
+AttackTraits[WorkSlave] = -0.3;
+AttackTraits[Legend] = 0.2;
+
+let NormalAttackTraits = new Float32Array(TraitCount);
+NormalAttackTraits[ZenMind] = 0.1;
+NormalAttackTraits[CelestialEmperor] = 0.2;
+
+let DarkAttackTraits = new Float32Array(TraitCount);
+DarkAttackTraits[VeilOfDarkness] = 0.1;
+DarkAttackTraits[LordOfTheUnderworld] = 0.2;
+
+let DragonAttackTraits = new Float32Array(TraitCount);
+DragonAttackTraits[BloodOfTheDragon] = 0.1;
+DragonAttackTraits[DivineDragon] = 0.2;
+
+let FireAttackTraits = new Float32Array(TraitCount);
+FireAttackTraits[Pyromaniac] = 0.1;
+FireAttackTraits[FlameEmperor] = 0.2;
+
+let WaterAttackTraits = new Float32Array(TraitCount);
+WaterAttackTraits[Hydromaniac] = 0.1;
+WaterAttackTraits[LordOfTheSea] = 0.2;
+
+let ElectricityAttackTraits = new Float32Array(TraitCount);
+ElectricityAttackTraits[Capacitor] = 0.1;
+ElectricityAttackTraits[LordOfLightning] = 0.2;
+
+let EarthAttackTraits = new Float32Array(TraitCount);
+EarthAttackTraits[PowerOfGaia] = 0.1;
+EarthAttackTraits[EarthEmperor] = 0.2;
+
+let GrassAttackTraits = new Float32Array(TraitCount);
+GrassAttackTraits[FragrantFoliage] = 0.1;
+GrassAttackTraits[SpiritEmperor] = 0.2;
+
+let IceAttackTraits = new Float32Array(TraitCount);
+IceAttackTraits[Coldblooded] = 0.1;
+IceAttackTraits[IceEmperor] = 0.2;
+
 function SpeedMultiplier(pal) {
   return Multiplier(pal, SpeedTraits);
 }
@@ -827,8 +877,16 @@ function Sanity(pal) {
   return Multiplier(pal, SanityTraits);
 }
 
+function AttackMultiplier(pal) {
+  return Multiplier(pal, AttackTraits);
+}
+
 function Hunger(pal) {
   return Stats[pal.id].food_requirement * HungerMultiplier(pal);
+}
+
+function NightActivityMultiplier(pal) {
+  return Pal.HasType(pal, Dark) ? 1.15 : 1;
 }
 
 function ScoreMount(pal) {
@@ -836,26 +894,26 @@ function ScoreMount(pal) {
   let score = stats.mount_speed * (stats.flying ? 1.0 : 0.5);
   return score * SpeedMultiplier(pal);
 }
-function ScoreKindling(pal) { return Stats[pal.id].kindling * WorkSpeed(pal); }
-function ScoreWatering(pal) { return Stats[pal.id].watering * WorkSpeed(pal); }
-function ScorePlanting(pal) { return Stats[pal.id].planting * WorkSpeed(pal); }
-function ScoreElectric(pal) { return Stats[pal.id].electric * WorkSpeed(pal); }
+function ScoreKindling(pal) { return Stats[pal.id].kindling * WorkSpeed(pal) * NightActivityMultiplier(pal); }
+function ScoreWatering(pal) { return Stats[pal.id].watering * WorkSpeed(pal) * NightActivityMultiplier(pal); }
+function ScorePlanting(pal) { return Stats[pal.id].planting * WorkSpeed(pal) * NightActivityMultiplier(pal); }
+function ScoreElectric(pal) { return Stats[pal.id].electric * WorkSpeed(pal) * NightActivityMultiplier(pal); }
 function ScoreHandiwork(pal) {
-  return Stats[pal.id].handiwork * WorkSpeed(pal);
+  return Stats[pal.id].handiwork * WorkSpeed(pal) * NightActivityMultiplier(pal);
 }
 function ScoreGathering(pal) {
-  return Stats[pal.id].gathering * WorkSpeed(pal);
+  return Stats[pal.id].gathering * WorkSpeed(pal) * NightActivityMultiplier(pal);
 }
 function ScoreLumbering(pal) {
-  return Stats[pal.id].lumbering * WorkSpeed(pal);
+  return Stats[pal.id].lumbering * WorkSpeed(pal) * NightActivityMultiplier(pal);
 }
-function ScoreMining(pal) { return Stats[pal.id].mining * WorkSpeed(pal); }
-function ScoreMedicine(pal) { return Stats[pal.id].medicine * WorkSpeed(pal); }
-function ScoreCooling(pal) { return Stats[pal.id].cooling * WorkSpeed(pal); }
+function ScoreMining(pal) { return Stats[pal.id].mining * WorkSpeed(pal) * NightActivityMultiplier(pal); }
+function ScoreMedicine(pal) { return Stats[pal.id].medicine * WorkSpeed(pal) * NightActivityMultiplier(pal); }
+function ScoreCooling(pal) { return Stats[pal.id].cooling * WorkSpeed(pal) * NightActivityMultiplier(pal); }
 
 function ScoreTransporting(pal) {
   return Stats[pal.id].transporting * TransportSpeed[pal.id] *
-    SpeedMultiplier(pal);
+    SpeedMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 let WoolProduction = new Float32Array(LastID);
@@ -864,11 +922,11 @@ WoolProduction[Cremis] = 2;
 WoolProduction[Melpaca] = 2;
 
 function ScoreWool(pal) {
-  return WoolProduction[pal.id] * Sanity(pal) / HungerMultiplier(pal);
+  return WoolProduction[pal.id] * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreEggs(pal) {
-  return (pal.id == Chikipi ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Chikipi ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 let GoldProduction = new Float32Array(LastID);
@@ -877,50 +935,81 @@ GoldProduction[Mau] = 2;
 GoldProduction[MauCryst] = 2;
 
 function ScoreGold(pal) {
-  return GoldProduction[pal.id] * Sanity(pal) / HungerMultiplier(pal);
+  return GoldProduction[pal.id] * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScorePalspheres(pal) {
-  return (pal.id == Vixy ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Vixy ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreMilk(pal) {
-  return (pal.id == Mozzarina ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Mozzarina ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreCottonCandy(pal) {
-  return (pal.id == Woolipop ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Woolipop ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreBerry(pal) {
-  return (pal.id == Caprity ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Caprity ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreHoney(pal) {
-  return (pal.id == Beegarde ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Beegarde ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreFlameOrgan(pal) {
-  return (pal.id == Flambelle ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Flambelle ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
 }
 
 function ScoreHighQualityCloth(pal) {
-  return (pal.id == Sibelyx ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal);
+  return (pal.id == Sibelyx ? 1 : 0) * Sanity(pal) / HungerMultiplier(pal) * NightActivityMultiplier(pal);
+}
+
+function TraitSelector(traits_array) {
+  return function () {
+    return TopSkillsFromRooster(traits_array);
+  };
+}
+
+const BestTraitsForFarming = [
+  Workaholic,
+  PositiveThinker,
+  DietLover,
+  DaintyEater,
+];
+
+function TypedAttackMetric(type, attack_traits) {
+  return {
+    score_fn: function (pal) {
+      // Same Type Attack Bonus
+      let stab = Pal.HasType(pal, type) ? 1.2 : 1;
+      return Stats[pal.id].shot * AttackMultiplier(pal) * stab * Multiplier(pal, attack_traits);
+    }, tracked_traits: function () {
+      let arr1 = TopSkillsFromRooster(attack_traits);
+      let arr2 = TopSkillsFromRooster(AttackTraits);
+      let arr = arr1.concat(arr2);
+      if (arr.length > 4) {
+        arr.length = 4;
+      }
+      return arr;
+    }
+  }
 }
 
 const Metrics = {
-  "Fastest 🐎": { score_fn: ScoreMount, tracked_traits: BestTraitsForMount },
-  "Best 🔥": { score_fn: ScoreKindling, tracked_traits: BestTraitsForWorker },
-  "Best 💦": { score_fn: ScoreWatering, tracked_traits: BestTraitsForWorker },
-  "Best 🌱": { score_fn: ScorePlanting, tracked_traits: BestTraitsForWorker },
-  "Best ⚡": { score_fn: ScoreElectric, tracked_traits: BestTraitsForWorker },
-  "Best ✋": { score_fn: ScoreHandiwork, tracked_traits: BestTraitsForWorker },
-  "Best Gathering 🌿": { score_fn: ScoreGathering, tracked_traits: BestTraitsForWorker },
-  "Best 🪵": { score_fn: ScoreLumbering, tracked_traits: BestTraitsForWorker },
-  "Best ⛏️": { score_fn: ScoreMining, tracked_traits: BestTraitsForWorker },
-  "Best 🥣": { score_fn: ScoreMedicine, tracked_traits: BestTraitsForWorker },
-  "Best ❄️": { score_fn: ScoreCooling, tracked_traits: BestTraitsForWorker },
-  "Best 📦": { score_fn: ScoreTransporting, tracked_traits: BestTraitsForTransporting },
+  "<img width=20 src=kindling.png>": { score_fn: ScoreKindling, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=watering.png>": { score_fn: ScoreWatering, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=planting.png>": { score_fn: ScorePlanting, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=generatingElectricity.png>": { score_fn: ScoreElectric, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=handiwork.png>": { score_fn: ScoreHandiwork, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=gathering.png>": { score_fn: ScoreGathering, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=lumbering.png>": { score_fn: ScoreLumbering, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=mining.png>": { score_fn: ScoreMining, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=medicineProduction.png>": { score_fn: ScoreMedicine, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=cooling.png>": { score_fn: ScoreCooling, tracked_traits: TraitSelector(WorkSpeedTraits) },
+  "<img width=20 src=transporting.png>": { score_fn: ScoreTransporting, tracked_traits: TraitSelector(SpeedTraits) },
+  "Fastest 🐎": { score_fn: ScoreMount, tracked_traits: TraitSelector(SpeedTraits) },
   "Wool Farming 🐑": { score_fn: ScoreWool, tracked_traits: BestTraitsForFarming },
   "Eggs Farming 🥚": { score_fn: ScoreEggs, tracked_traits: BestTraitsForFarming },
   "Gold Farming 💰": { score_fn: ScoreGold, tracked_traits: BestTraitsForFarming },
@@ -931,6 +1020,20 @@ const Metrics = {
   "Honey Farming 🍯": { score_fn: ScoreHoney, tracked_traits: BestTraitsForFarming },
   "Flame Organ Farming ❤️‍🔥": { score_fn: ScoreFlameOrgan, tracked_traits: BestTraitsForFarming },
   "High Quality Cloth Farming 🧣": { score_fn: ScoreHighQualityCloth, tracked_traits: BestTraitsForFarming },
+  "Highest ⚔️": {
+    score_fn: function (pal) {
+      return Stats[pal.id].shot * AttackMultiplier(pal);
+    }, tracked_traits: TraitSelector(AttackTraits)
+  },
+  "<img width=24 src=normal.png>⚔️": TypedAttackMetric(Normal, NormalAttackTraits),
+  "<img width=24 src=dark.png>⚔️": TypedAttackMetric(Dark, DarkAttackTraits),
+  "<img width=24 src=dragon.png>⚔️": TypedAttackMetric(Dragon, DragonAttackTraits),
+  "<img width=24 src=ice.png>⚔️": TypedAttackMetric(Ice, IceAttackTraits),
+  "<img width=24 src=fire.png>⚔️": TypedAttackMetric(Fire, FireAttackTraits),
+  "<img width=24 src=water.png>⚔️": TypedAttackMetric(Water, WaterAttackTraits),
+  "<img width=24 src=electric.png>⚔️": TypedAttackMetric(Electricity, ElectricityAttackTraits),
+  "<img width=24 src=ground.png>⚔️": TypedAttackMetric(Earth, EarthAttackTraits),
+  "<img width=24 src=grass.png>⚔️": TypedAttackMetric(Leaf, GrassAttackTraits),
 };
 
 let genders = ['♂', '♀'];
@@ -1574,8 +1677,17 @@ function PredefinedSearch(metric_name) {
   for (let i = 1; i < TraitCount; i++) {
     Module.HEAPU8[bad_traits_ptr + i] = 1; // Mark all traits as "bad"
   }
-  for (let t of metric.tracked_traits) {
-    Module.HEAPU8[bad_traits_ptr + t] = 0; // Mark the tracked traits as "not bad"
+  if (typeof metric.tracked_traits === 'object') {
+    for (let t of metric.tracked_traits) {
+      Module.HEAPU8[bad_traits_ptr + t] = 0; // Mark the tracked traits as "not bad"
+    }
+  } else if (typeof metric.tracked_traits === 'function') {
+    let traits = metric.tracked_traits();
+    for (let t of traits) {
+      Module.HEAPU8[bad_traits_ptr + t] = 0; // Mark the tracked traits as "not bad"
+    }
+  } else {
+    throw new Error('Unknown type of metric.tracked_traits:' + typeof metric.tracked_traits);
   }
   Module.ccall('BreedStart', 'void', [], []);
   setTimeout(BreedStep, 0);
@@ -1587,9 +1699,8 @@ let progress = null;
 
 function Main() {
   for (let metric_name in Metrics) {
-    let metric_btn = document.createElement('input');
-    metric_btn.type = 'button';
-    metric_btn.value = metric_name;
+    let metric_btn = document.createElement('button');
+    metric_btn.innerHTML = metric_name;
     metric_btn.onclick = function () {
       PredefinedSearch(metric_name);
     };

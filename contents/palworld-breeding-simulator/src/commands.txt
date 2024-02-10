@@ -1,0 +1,1 @@
+em++ main_breed.cc -DNDEBUG -std=c++23 -O3 -o breed.js -sEXPORTED_FUNCTIONS=_TraitCount,_TraitName,_IDCount,_IDName,_ReservePalArray,_RoosterSize,_RoosterData,_BestPalsSize,_BestPalsData,_BreedStep,_BreedStart,_BadTraits -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,setValue,getValue --js-library lib.js && mv breed.js breed.wasm ../

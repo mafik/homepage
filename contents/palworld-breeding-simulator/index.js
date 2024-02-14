@@ -1641,6 +1641,23 @@ advanced_search_score_textarea.onchange();
 
 var ActiveScore = undefined;
 
+var last_tracked_traits = 'first run guard';
+function MaybeBreed(tracked_traits) {
+  if (String(tracked_traits) != last_tracked_traits) {
+    last_tracked_traits = String(tracked_traits);
+    let bad_traits_ptr = Module._BadTraits;
+    // Skip NoTrait at index 0
+    for (let i = 1; i < TraitCount; i++) {
+      Module.HEAPU8[bad_traits_ptr + i] = 1; // Mark all traits as "bad"
+    }
+    for (let t of tracked_traits) {
+      Module.HEAPU8[bad_traits_ptr + t] = 0; // Mark the tracked traits as "not bad"
+    }
+    Module.ccall('BreedStart', 'void', [], []);
+  }
+  setTimeout(BreedStep, 0);
+}
+
 function AdvancedSearch() {
   best_pals_div.innerHTML = `Advanced search...`;
   progress = document.createElement('progress');
@@ -1656,14 +1673,14 @@ function AdvancedSearch() {
     let stats = Stats[pal.id];
     return Score(IDToStr[pal.id], pal.gender ? 'F' : 'M', skills, stats);
   };
-  let bad_traits_ptr = Module._BadTraits;
+  let tracked_traits = [];
   // Account for NoTrait at index 0
   for (let i = 1; i < TraitCount; i++) {
-    // 0 means the trait is "not bad"
-    Module.HEAPU8[bad_traits_ptr + i] = skill_checkboxes[i - 1].checked ? 0 : 1;
+    if (skill_checkboxes[i - 1].checked) {
+      tracked_traits.push(i);
+    }
   }
-  Module.ccall('BreedStart', 'void', [], []);
-  setTimeout(BreedStep, 0);
+  MaybeBreed(tracked_traits);
 };
 
 function PredefinedSearch(metric_name) {
@@ -1683,25 +1700,15 @@ function PredefinedSearch(metric_name) {
       return metric.score_fn(pal);
     };
   }
-  let bad_traits_ptr = Module._BadTraits;
-  // Skip NoTrait at index 0
-  for (let i = 1; i < TraitCount; i++) {
-    Module.HEAPU8[bad_traits_ptr + i] = 1; // Mark all traits as "bad"
-  }
+  let tracked_traits = [];
   if (typeof metric.tracked_traits === 'object') {
-    for (let t of metric.tracked_traits) {
-      Module.HEAPU8[bad_traits_ptr + t] = 0; // Mark the tracked traits as "not bad"
-    }
+    tracked_traits = metric.tracked_traits;
   } else if (typeof metric.tracked_traits === 'function') {
-    let traits = metric.tracked_traits();
-    for (let t of traits) {
-      Module.HEAPU8[bad_traits_ptr + t] = 0; // Mark the tracked traits as "not bad"
-    }
+    tracked_traits = metric.tracked_traits();
   } else {
     throw new Error('Unknown type of metric.tracked_traits:' + typeof metric.tracked_traits);
   }
-  Module.ccall('BreedStart', 'void', [], []);
-  setTimeout(BreedStep, 0);
+  MaybeBreed(tracked_traits);
 }
 
 let best_pals_div = document.getElementById('best-pals');
@@ -1788,7 +1795,6 @@ function Main() {
   let trait_selects = [];
   for (let t = 0; t < 4; ++t) {
     let trait_select = document.createElement('select');
-    trait_select.id = `trait{i}_select`;
     for (let i = 0; i < TraitCount; i++) {
       let option = document.createElement('option');
       option.value = i;

@@ -1672,7 +1672,17 @@ function PredefinedSearch(metric_name) {
   progress = document.createElement('progress');
   best_pals_div.appendChild(progress);
   PalsToCpp();
-  ActiveScore = metric.score_fn;
+  let filter_id = Number(pal_filter.value);
+  if (filter_id === -1) {
+    ActiveScore = metric.score_fn;
+  } else {
+    ActiveScore = function (pal) {
+      if (pal.id !== filter_id) {
+        return -Infinity;
+      }
+      return metric.score_fn(pal);
+    };
+  }
   let bad_traits_ptr = Module._BadTraits;
   // Skip NoTrait at index 0
   for (let i = 1; i < TraitCount; i++) {
@@ -1697,6 +1707,8 @@ function PredefinedSearch(metric_name) {
 let best_pals_div = document.getElementById('best-pals');
 
 let progress = null;
+
+var pal_filter;
 
 function Main() {
   for (let metric_name in Metrics) {
@@ -1727,6 +1739,20 @@ function Main() {
   for (let i = 0; i < TraitCount; i++) {
     EncodeTrait[TraitName(i)] = i;
   }
+
+  pal_filter = document.createElement('select');
+  let no_filter = document.createElement('option');
+  no_filter.value = -1;
+  no_filter.text = 'Any Pal';
+  pal_filter.appendChild(no_filter);
+  for (let i = 0; i < LastID; i++) {
+    let option = document.createElement('option');
+    option.value = i;
+    option.text = `Only ${IDName(i)}`;
+    pal_filter.appendChild(option);
+  }
+  metric_buttons.appendChild(pal_filter);
+
 
 
   // Prepare the form for adding new pals

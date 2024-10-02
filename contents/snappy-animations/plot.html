@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Plot</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Iosevka';
+      font-size: 24px;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="plot.js"></script>
+  <details>
+    <summary>Linear</summary>
+    <label for="linearVelocity">Velocity [px/s]</label>
+    <input type="range" id="linearVelocity" min="25" max="200" value="50"><br>
+    <canvas id="linearCanvas" width="800" height="800"></canvas><br>
+    <script>
+      function LinearApproach(value, velocity, target, delta_t) {
+        value -= target;
+        value = Math.max(Math.abs(value) - delta_t * velocity, 0) * Math.sign(value);
+        return [value + target, velocity];
+      }
+      function ParametrizedLinearApproach(velocity) {
+        return function (value, target, delta_t) {
+          return LinearApproach(value, velocity, target, delta_t);
+        }
+      }
+
+      function RedrawLinear() {
+        Plot(linearCanvas, ParametrizedLinearApproach(linearVelocity.value));
+      }
+      RedrawLinear();
+      linearVelocity.addEventListener("input", RedrawLinear);
+    </script>
+  </details>
+
+  <details>
+    <summary>Exponential</summary>
+    <label for="exponentialDecay">Decay [s]</label>
+    <input type="range" id="exponentialDecay" min="0.2" max="5" value="1" step="0.1"><br>
+    <canvas id="exponentialCanvas" width="800" height="800"></canvas><br>
+    <script>
+      function ExponentialApproach(value, decay, target, delta_t) {
+        value += (value - target) * Math.expm1(-delta_t / decay);
+        return [value, 0];
+      }
+      function ParametrizedExponentialApproach(decay) {
+        return function (value, target, delta_t) {
+          return ExponentialApproach(value, decay, target, delta_t);
+        }
+      }
+
+      function RedrawExponential() {
+        Plot(exponentialCanvas, ParametrizedExponentialApproach(exponentialDecay.value));
+      }
+      RedrawExponential();
+      exponentialDecay.addEventListener("input", RedrawExponential);
+    </script>
+  </details>
+
+
+  <details>
+    <summary>Sine</summary>
+    <label for="sinePeriod">Period [s]</label>
+    <input type="range" id="sinePeriod" min="0.2" max="50" value="4" step="0.1"><br>
+    <label for="sineVelocity">Initial Velocity [px/s]</label>
+    <input type="range" id="sineVelocity" min="-200" max="200" value="0"><br>
+    <canvas id="sineCanvas" width="800" height="800"></canvas><br>
+    <script>
+      function SineApproach(value, velocity, period, target, delta_t) {
+        // x = t
+        // P1 = 2 * PI / period
+        // y = a * (1 - sin(x * P1))
+        // y' = -a * P1 * cos(x * P1)
+
+        let P1 = 2 * Math.PI / Number(period);
+        let y = value - target;
+        let v = Number(velocity);
+
+        let a;
+        if (Math.abs(velocity) < 1e-6) {
+          a = y / 2;
+        } else {
+          a = (v * v / P1 / P1 + y * y) / y / 2;
+        }
+
+        if (Math.abs(a) > Math.abs(y)) {
+          a = y;
+        }
+
+        if (v < -Math.abs(a) * P1) {
+          v = -Math.abs(a) * P1;
+        } else if (v > Math.abs(a) * P1) {
+          v = Math.abs(a) * P1;
+        }
+        let fract = Math.abs((a * P1 + v) / (a * P1 - v));
+        let x = -2 * Math.atan(Math.sqrt(fract));
+
+        if (x > Math.PI / 2) x -= Math.PI * 2;
+        x += delta_t * P1;
+        if (x > Math.PI / 2) x = Math.PI / 2;
+
+        return [a * (1 - Math.sin(x)) + target, -a * P1 * Math.cos(x)];
+      }
+      function ParametrizedSineApproach(period) {
+        return function (value, velocity, target, delta_t) {
+          return SineApproach(value, velocity, period, target, delta_t);
+        }
+      }
+
+      function RedrawSine() {
+        Plot(sineCanvas, ParametrizedSineApproach(sinePeriod.value), sineVelocity.value);
+      }
+      RedrawSine();
+      sinePeriod.addEventListener("input", RedrawSine);
+      sineVelocity.addEventListener("input", RedrawSine);
+    </script>
+  </details>
+
+  <details>
+    <summary>Spring</summary>
+    <label for="springPeriod">Period [s]</label><br>
+    <input type="range" id="springPeriod" min="0.2" max="5" value="3" step="0.1"><br>
+    <label for="springHalfLife">Half-life [s]</label><br>
+    <input type="range" id="springHalfLife" min="0.1" max="5" value="1" step="0.1"><br>
+    <label for="springVelocity">Initial Velocity [px/s]</label><br>
+    <input type="range" id="springVelocity" min="-200" max="200" value="100"><br>
+    <canvas id="springCanvas" width="800" height="800"></canvas><br>
+    <script>
+      function SpringApproach(value, velocity, period, half_life, target, delta_t) {
+        // P1 = 2 * PI / period
+        // P2 = -log(2) / half_life
+        // value = a * cos(t * P1) * exp(t * P2)
+        // velocity = a * exp(t * P2) * (P2 * cos(t * P1) - P1 * sin(t * P1))
+
+        let P1 = 2 * Math.PI / period;
+        let P2 = -1 / Math.LOG2E / half_life;
+        value -= target;
+
+        let arg = P1 * value / Math.sqrt(P1 * P1 * value * value + P2 * P2 * value * value - 2 * P2 * velocity * value + velocity * velocity);
+
+        let ts = [-Math.acos(-arg) / P1, Math.acos(-arg) / P1, Math.acos(arg) / P1, -Math.acos(arg) / P1];
+
+        let best_t, best_a;
+        let best_t_err = Infinity;
+        for (let t of ts) {
+          let a = value / Math.cos(t * P1) / Math.exp(t * P2);
+          let new_v = a * Math.exp(t * P2) * (P2 * Math.cos(P1 * t) - P1 * Math.sin(P1 * t));
+          let err = Math.abs(velocity - new_v);
+          if (err < best_t_err) {
+            best_x = t;
+            best_a = a;
+            best_t_err = err;
+          }
+        }
+
+        let t = best_x + delta_t;
+        let a = best_a;
+        return [a * Math.cos(t * P1) * Math.exp(t * P2) + target, a * Math.exp(t * P2) * (P2 * Math.cos(P1 * t) - P1 * Math.sin(P1 * t))];
+      }
+      function ParametrizedSpringApproach(period, half_life) {
+        return function (value, velocity, target, delta_t) {
+          return SpringApproach(value, velocity, period, half_life, target, delta_t);
+        }
+      }
+
+      function RedrawSpring() {
+        document.querySelector("label[for=springHalfLife]").innerText = "Half-life [s] (" + springHalfLife.value + ")";
+        document.querySelector("label[for=springPeriod]").innerText = "Period [s] (" + springPeriod.value + ")";
+        document.querySelector("label[for=springVelocity]").innerText = "Initial Velocity [px/s] (" + springVelocity.value + ")";
+        Plot(springCanvas, ParametrizedSpringApproach(springPeriod.value, springHalfLife.value), springVelocity.value);
+      }
+      RedrawSpring();
+      springPeriod.addEventListener("input", RedrawSpring);
+      springHalfLife.addEventListener("input", RedrawSpring);
+      springVelocity.addEventListener("input", RedrawSpring);
+    </script>
+  </details>
+
+  <details open>
+    <summary>Wrap</summary>
+    <label for="warpTime">Warp time [s]</label><br>
+    <input type="range" id="warpTime" min="0.2" max="5" value="3" step="0.1"><br>
+    <label for="warpDist">Warp dist [px]</label><br>
+    <input type="range" id="warpDist" min="1" max="300" value="115" step="1"><br>
+    <label for="warpVelocity">Initial Velocity [px/s]</label><br>
+    <input type="range" id="warpVelocity" min="-200" max="200" value="-200"><br>
+    <canvas id="warpCanvas" width="800" height="800"></canvas><br>
+    <script>
+      function WarpApproach(value, velocity, warp_time, warp_dist, target, delta_t) {
+        let y = (value - target) / warp_dist;
+        let v = velocity * warp_time / warp_dist;
+        let angle = Math.atan(v);
+
+        let a_x, a_y, a_sign;
+        if (y <= 0) {
+          a_sign = 1;
+        } else {
+          a_sign = -1;
+        }
+        a_x = Math.cos(angle + Math.PI / 2 * a_sign);
+        a_y = y + Math.sin(angle + Math.PI / 2 * a_sign);
+
+        let x = delta_t / warp_time;
+        let b_y = -a_sign;
+        let b_x;
+        if (a_x < 0 && Math.abs(b_y - y) <= 1 && Math.abs(y) < Math.abs(a_y + b_y) / 2) {
+          // B tangent to current position
+          b_x = Math.sqrt(1 - (b_y - y) * (b_y - y));
+        } else if (Math.abs(a_y) < 1) {
+          // B tangent to A
+          b_x = a_x + Math.sqrt(4 - (b_y - a_y) * (b_y - a_y));
+        } else {
+          // B on the right side of A
+          b_x = a_x + 2;
+        }
+
+
+        let x_mid = (a_x + b_x) / 2;
+
+        let y_result, dir = 0;
+        if (x >= b_x) {
+          return [target, 0];
+        } else if (x < x_mid) {
+          let alpha = Math.acos(x - a_x);
+          dir = 1 / Math.tan(alpha) * a_sign * warp_dist / warp_time;
+          y_result = -a_sign * Math.sin(alpha) + a_y;
+        } else {
+          let alpha = Math.acos(x - b_x);
+          dir = -1 / Math.tan(alpha) * a_sign * warp_dist / warp_time;
+          y_result = a_sign * Math.sin(alpha) + b_y;
+        }
+
+        return [y_result * warp_dist + target, dir];
+      }
+      function ParametrizedWarpApproach(warp_time, warp_dist) {
+        return function (value, velocity, target, delta_t) {
+          return WarpApproach(value, velocity, warp_time, warp_dist, target, delta_t);
+        }
+      }
+
+      function RedrawWarp() {
+        document.querySelector("label[for=warpDist]").innerText = "Warp dist [px] (" + warpDist.value + ")";
+        document.querySelector("label[for=warpTime]").innerText = "Warp time [s] (" + warpTime.value + ")";
+        document.querySelector("label[for=warpVelocity]").innerText = "Initial Velocity [px/s] (" + warpVelocity.value + ")";
+        Plot(warpCanvas, ParametrizedWarpApproach(warpTime.value, warpDist.value), warpVelocity.value);
+      }
+      RedrawWarp();
+      warpTime.addEventListener("input", RedrawWarp);
+      warpDist.addEventListener("input", RedrawWarp);
+      warpVelocity.addEventListener("input", RedrawWarp);
+    </script>
+
+  </details>
+</body>
+
+</html>

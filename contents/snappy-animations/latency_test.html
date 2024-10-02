@@ -1,0 +1,40 @@
+<!doctype html>
+
+<body style="margin:0">
+  <canvas id="analyticCanvas" width="1080" height="1080" style="outline:1px solid red; max-height: 100%; max-width: 100%; will-change: opacity;"></canvas>
+  <script>
+    (function () {
+      let canvas = analyticCanvas;
+      let mouseX, mouseY;
+      analyticCanvas.addEventListener('mousemove', function (event) {
+        mouseX = event.offsetX / canvas.offsetWidth * canvas.width;
+        mouseY = event.offsetY / canvas.offsetHeight * canvas.height;
+      });
+      let lastT = 0;
+      function AnalyticFrame(t) {
+        let ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+        ctx.strokeStyle = '#ff0';
+        ctx.clearRect(0, 0, analyticCanvas.width, analyticCanvas.height);
+        ctx.beginPath();
+        let t2 = t;
+        // t2 = Date.now();
+        let delta_t = (t2 - lastT) / 1000;
+        lastT = t2;
+        let a = t2 / 1000 % (2 * Math.PI);
+
+        // ctx.arc(mouseX + Math.cos(a) * 300, mouseY + Math.sin(a) * 100, 10, 0, 2 * Math.PI);
+        ctx.arc(mouseX, mouseY, 10, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        ctx.fillStyle = 'white';
+
+        let fps = 1 / delta_t;
+        ctx.fillText(fps.toFixed(2) + ' fps', 10, 20);
+
+        // setTimeout(AnalyticFrame, 16);
+        requestAnimationFrame(AnalyticFrame);
+      }
+      AnalyticFrame(0);
+    })();
+  </script>
+</body>

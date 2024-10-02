@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Snappy Animations - Numerical Tricks for Low-Latency Visual Feedback</title>
+  <style>
+    @font-face {
+      font-family: 'Voltaire';
+      src: url('Voltaire-Regular.ttf') format('truetype');
+    }
+
+    html {
+      font-family: 'Voltaire', sans-serif;
+      /* scroll-behavior: smooth; */
+      color: black;
+      -webkit-text-stroke: 4px rgba(255, 255, 255, 0.4);
+      paint-order: stroke fill;
+    }
+
+    body {
+      margin: 0;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+
+    .slide {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      font-size: 5vmin;
+      box-sizing: border-box;
+      background: url('bg.png') no-repeat center center;
+      background-size: cover;
+      /* padding: 1vmin; */
+      display: grid;
+      grid-template-rows: repeat(9, 1fr);
+      grid-template-columns: repeat(16, 1fr);
+      padding: 10px;
+      gap: 20px;
+      grid-template-areas:
+        "title title title title title title title title title title title title title title title title"
+        "title title title title title title title title title title title title title title title title"
+        "body body body body body body body body body body body body body body body body"
+        "body body body body body body body body body body body body body body body body"
+        "body body body body body body body body body body body body body body body body"
+        "body body body body body body body body body body body body body body body body"
+        "body body body body body body body body body body body body body body body body"
+        "body body body body body body body body body body body body body body body body"
+        "body body body body body body body body body body body body body body body body";
+      place-items: center;
+      grid-auto-flow: column;
+    }
+
+    nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+      text-align: center;
+      font-weight: normal;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: calc(min(1.5em, 80px));
+      grid-area: title;
+    }
+
+    .slide>img {
+      object-fit: contain;
+    }
+
+    pre {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    code {
+      font-family: 'Iosevka';
+    }
+
+    ol {
+      margin: 0;
+    }
+
+    ::selection {
+      background: rgba(255, 0, 242, 0.3);
+      -webkit-text-stroke-color: transparent;
+      text-shadow: 0 0 3px white;
+    }
+
+    .footnote {
+      -webkit-text-stroke: 0 transparent;
+      color: black;
+      font-size: 0.5em;
+      background: rgba(255, 255, 255, 0.4);
+      padding: 0 1px;
+      position: absolute;
+      bottom: 1vmin;
+      right: 1vmin;
+      font-size: 2vmin;
+    }
+
+    a {
+      -webkit-text-stroke: unset;
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: subgrid;
+      grid-template-rows: subgrid;
+      grid-row: 1 / span 9;
+      grid-column: 1 / span 16;
+      place-items: inherit;
+
+      >img {
+        object-fit: contain;
+      }
+    }
+
+    .layer {
+      opacity: 0;
+      transform: scale(1.1);
+      transition: opacity 1s, transform 1s;
+    }
+
+    .layer.shown {
+      transform: scale(1);
+      opacity: 1;
+    }
+  </style>
+  <link rel="stylesheet" href="highlight/styles/foundation.min.css">
+</head>
+
+<body>
+  <script src="plot.js"></script>
+  <script>
+    function LERP(a, b, t) {
+      return a + (b - a) * t;
+    }
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+    function ratio(value, min, max) {
+      return clamp((value - min) / (max - min), 0, 1);
+    }
+    function LinearApproach(value, dummy_v, velocity, target, delta_t) {
+      value -= target;
+      value = Math.max(Math.abs(value) - delta_t * velocity, 0) * Math.sign(value);
+      return [value + target, velocity];
+    }
+    function ExponentialApproach(value, dummy_v, decay, target, delta_t) {
+      value += (value - target) * Math.expm1(-delta_t / decay * Math.LN2);
+      return [value, 0];
+    }
+    function SineApproach(value, velocity, period, target, delta_t) {
+      // x = t
+      // P1 = 2 * PI / period
+      // y = a * (1 - sin(x * P1))
+      // y' = -a * P1 * cos(x * P1)
+
+      let P1 = 2 * Math.PI / Number(period);
+      let y = value - target;
+      let v = Number(velocity);
+
+      let a;
+      if (Math.abs(velocity) < 1e-6) {
+        a = y / 2;
+      } else {
+        a = (v * v / P1 / P1 + y * y) / y / 2;
+      }
+
+      if (Math.abs(a) > Math.abs(y)) {
+        a = y;
+      }
+
+      if (v < -Math.abs(a) * P1) {
+        v = -Math.abs(a) * P1;
+      } else if (v > Math.abs(a) * P1) {
+        v = Math.abs(a) * P1;
+      }
+      let fract = Math.abs((a * P1 + v) / (a * P1 - v));
+      let x;
+      if (isNaN(fract)) {
+        x = 0;
+      } else {
+        x = -2 * Math.atan(Math.sqrt(fract));
+      }
+
+      if (x > Math.PI / 2) x -= Math.PI * 2;
+      x += delta_t * P1;
+      if (x > Math.PI / 2) x = Math.PI / 2;
+
+      return [a * (1 - Math.sin(x)) + target, -a * P1 * Math.cos(x)];
+    }
+    function SpringApproach(value, velocity, period, half_life, target, delta_t) {
+      // P1 = 2 * PI / period
+      // P2 = -log(2) / half_life
+      // value = a * cos(t * P1) * exp(t * P2)
+      // velocity = a * exp(t * P2) * (P2 * cos(t * P1) - P1 * sin(t * P1))
+
+      let P1 = 2 * Math.PI / period;
+      let P2 = -1 / Math.LOG2E / half_life;
+      value -= target;
+
+      let arg = P1 * value / Math.sqrt(P1 * P1 * value * value + P2 * P2 * value * value - 2 * P2 * velocity * value + velocity * velocity);
+      if (isNaN(arg)) {
+        return [target, 0];
+      }
+
+      let ts = [-Math.acos(-arg) / P1, Math.acos(-arg) / P1, Math.acos(arg) / P1, -Math.acos(arg) / P1];
+
+      let best_t, best_a;
+      let best_t_err = Infinity;
+      for (let t of ts) {
+        let a = value / Math.cos(t * P1) / Math.exp(t * P2);
+        let new_v = a * Math.exp(t * P2) * (P2 * Math.cos(P1 * t) - P1 * Math.sin(P1 * t));
+        let err = Math.abs(velocity - new_v);
+        if (err < best_t_err) {
+          best_t = t;
+          best_a = a;
+          best_t_err = err;
+        }
+      }
+
+      let t = best_t + delta_t;
+      let a = best_a;
+      return [a * Math.cos(t * P1) * Math.exp(t * P2) + target, a * Math.exp(t * P2) * (P2 * Math.cos(P1 * t) - P1 * Math.sin(P1 * t))];
+    }
+    function WarpApproach(value, velocity, warp_time, warp_dist, target, delta_t) {
+      let y = (value - target) / warp_dist;
+      let v = velocity * warp_time / warp_dist;
+      let angle = Math.atan(v);
+
+      let a_x, a_y, a_sign;
+      if (y <= 0) {
+        a_sign = 1;
+      } else {
+        a_sign = -1;
+      }
+      a_x = Math.cos(angle + Math.PI / 2 * a_sign);
+      a_y = y + Math.sin(angle + Math.PI / 2 * a_sign);
+
+      let x = delta_t / warp_time;
+      let b_y = -a_sign;
+      let b_x;
+      if (a_x < 0 && Math.abs(b_y - y) <= 1 && Math.abs(y) < Math.abs(a_y + b_y) / 2) {
+        // B tangent to current position
+        b_x = Math.sqrt(1 - (b_y - y) * (b_y - y));
+      } else if (Math.abs(a_y) < 1) {
+        // B tangent to A
+        b_x = a_x + Math.sqrt(4 - (b_y - a_y) * (b_y - a_y));
+      } else {
+        // B on the right side of A
+        b_x = a_x + 2;
+      }
+
+
+      let x_mid = (a_x + b_x) / 2;
+
+      let y_result, dir = 0;
+      if (x >= b_x) {
+        return [target, 0];
+      } else if (x < x_mid) {
+        let alpha = Math.acos(x - a_x);
+        dir = 1 / Math.tan(alpha) * a_sign * warp_dist / warp_time;
+        y_result = -a_sign * Math.sin(alpha) + a_y;
+      } else {
+        let alpha = Math.acos(x - b_x);
+        dir = -1 / Math.tan(alpha) * a_sign * warp_dist / warp_time;
+        y_result = a_sign * Math.sin(alpha) + b_y;
+      }
+
+      return [y_result * warp_dist + target, dir];
+    }
+  </script>
+  <div class="slide" id="title">
+    <h1 style="grid-row: 3 / span 3; grid-column: 1/span 16;">Snappy Animations</h1>
+    <h2 style="grid-row: 6 / span 2; grid-column: 1/span 16;">Numerical Tricks for Low-Latency Visual&nbsp;Feedback</h2>
+  </div>
+  <div class="slide"><img style="grid-area: 1 / 1 / span 9 / span 16; place-self: stretch" src="interface.webp"></div>
+  <div class="slide" id="automaticity">
+    <h3 style="grid-area: 1 / 1 / span 2 / span 16"><strong>Automaticity</strong>: acting without thinking</h3>
+    <div class="layer" style="grid-area: 5 / 1 / span 1 / span 6;">Procedural Memory</div>
+    <div class="layer" style="grid-area: 6 / 1 / span 1 / span 6;">Muscle Memory</div>
+    <!-- <div style="grid-area: 6 / 1 / span 1 / span 6;">Immersion</div> -->
+    <img style="grid-area: 3 / 6 / span 6 / span 11; place-self: center" src="brain-device.webp">
+  </div>
+  <div class="slide"><img style="grid-area: 1 / 1 / span 9 / span 16; place-self: center" src="brain-chess.webp"></div>
+  <div class="slide"><img style="grid-area: 1 / 1 / span 9 / span 16; place-self: stretch" src="conditioning.webp"></div>
+  <div class="slide">
+    <p style="grid-area: 4 / 1 / span 1 / span 16; place-self: center">Classical conditioning can produce automaticity.</p>
+    <p class="layer" style="grid-area: 6 / 1 / span 1 / span 16; place-self: center">Not the kind of automaticity that we're interested in.</p>
+  </div>
+  <div class="slide">
+    <p style="grid-area: 4 / 2 / span 1 / span 9; place-self: center">Classical conditioning requires some latency ≠ 0.</p>
+    <p class="layer" style="grid-area: 6 / 2 / span 1 / span 9; place-self: center">Understanding / mental model of the task is optional.</p>
+    <img style="grid-area: 1 / 11 / span 9 / span 5; place-self: stretch" src="Classi13.png">
+  </div>
+  <div class="slide">
+    <h3>Obtaining Automaticity:</h3>
+    <ul style="grid-column: 1 / span 8; grid-row: 3 / span 6; place-self: center">
+      <li class="layer">repetition</li>
+      <li class="layer">reinforcement</li>
+      <li class="layer"><span style="font-style: italic; background: rgba(255, 255, 255, 0.4); padding: 0 .2em 0 .1em">immersion</span></li>
+    </ul>
+    <p class="layer" style="grid-column: 8 / span 7; grid-row: 4; place-self: center">Expertise ~ Automaticity</p>
+    <img class="layer" src="arrow-up.webp" style="grid-column: 8 / span 7; grid-row: 5 / span 2; place-self: stretch">
+    <p class="layer" style="grid-column: 8 / span 7; grid-row: 7; place-self: center">User interface</p>
+  </div>
+
+  <div class="slide">
+    <h3>Information theoretic approach to UI</h3>
+    <img class="layer" src="shannon.webp" style="grid-column: 2 / span 14; grid-row: 4 / span 3; place-self: stretch">
+    <p class="layer" style="grid-column: 1 / span 16; grid-row: 8; place-self: center">bandwidth ≠ latency</p>
+  </div>
+
+  <div class="slide" id="agenda">
+    <h3>Agenda</h3>
+    <ol style="padding: 0; margin: 0; display: grid; grid-template-rows: subgrid; grid-row: 3 / span 5; grid-column: 2 / span 14; place-items: center start;">
+      <li class="layer" style="grid-row: 1; grid-column: 1;">Intro to user interfaces & latency</li>
+      <li class="layer" style="grid-row: 2; grid-column: 1;">Pros & cons of animation techniques</li>
+      <li class="layer" style="grid-row: 3; grid-column: 1;">Formulas for animated approach</li>
+      <li class="layer" style="grid-row: 4; grid-column: 1;">Drag & drop</li>
+      <li class="layer" style="grid-row: 5; grid-column: 1;">Final tips</li>
+    </ol>
+    <div class="layer" style="grid-column: 1 / span 16; grid-row: 9">There will be QR code at the end of the presentation.</div>
+  </div>
+  <div class="slide">
+    <h3>Timeline-based animation</h3>
+    <img class="layer" src="timeline.webp" style="grid-column: 2 / span 14; grid-row: 3 / span 4; place-self: stretch">
+    <div class="layer" style="grid-column: 2 / span 14; grid-row: 7">HTML support: 💪</div>
+    <div class="layer" style="grid-column: 2 / span 14; grid-row: 8">Interactivity: 👎</div>
+  </div>
+  <div class="slide">
+    <h3>Simulation-driven animation</h3>
+    <video style="grid-column: 1 / span 8; grid-row: 3 / span 6; place-self: stretch;" src="box2d.webm" loop autoplay muted></video>
+    <div class="wrap layer">
+      <img style="grid-column: 9 / span 2; grid-row: 3 / span 2; place-self: stretch;" src="springy-attachment.webp">
+      <div style="grid-column: 11 / span 6; grid-row: 3 / span 2; place-self: center start;">Springy attachment</div>
+    </div>
+    <div class="wrap layer">
+      <img style="grid-column: 9 / span 2; grid-row: 5 / span 2; place-self: stretch;" src="display-vs-simulation.webp">
+      <div style="grid-column: 11 / span 6; grid-row: 5 / span 2; place-self: center start;">Synchronization</div>
+    </div>
+    <div class="wrap layer">
+      <img style="grid-column: 9 / span 2; grid-row: 7 / span 2; place-self: stretch;" src="power-draw.webp">
+      <div style="grid-column: 11 / span 6; grid-row: 7 / span 2; place-self: center start;">Power draw</div>
+    </div>
+  </div>
+  <div class="slide" id="analytic">
+    <div class="wrap layer">
+      <img src="analytic-timeline.webp" style="grid-column: 2 / span 3; grid-row: 3 / span 3; place-self: stretch;">
+      <span style="color: darkgreen; grid-column: 5 / span 6; grid-row: 4; place-self: center start;">Easy to integrate</span>
+    </div>
+    <div class="wrap layer">
+      <img src="three-body.webp" style="grid-column: 2 / span 3; grid-row: 6 / span 3; place-self: stretch;">
+      <span style="color: darkred; grid-column: 5 / span 6; grid-row: 7; place-self: center start;">No complex interactions</span>
+    </div>
+    <h3 class="layer">Analytic animation</h3>
+    <img class="layer" src="analytic-intro.webp" style="grid-column: 9 / span 7; grid-row: 3 / span 6; place-self: stretch;">
+    <img id="planet" src="planet.webp" style="position: absolute; height: 180px; top: 50vh; left: 50vw; filter:drop-shadow(0px 10px 20px); pointer-events: none;">
+    <script>
+      (function () {
+        let planet = document.getElementById('planet');
+        let analytic = document.getElementById('analytic');
+        let planet_x = innerWidth / 2, planet_y = innerHeight / 2;
+        let planet_vx = 0, planet_vy = 0;
+        let mouse_x = innerWidth / 2, mouse_y = innerHeight / 2;
+        analytic.addEventListener('mousemove', function (event) {
+          mouse_x = event.clientX;
+          mouse_y = event.clientY;
+        });
+        let last_t = 0;
+        let frameRequest = null;
+        function AnalyticFrame(t) {
+          let delta_t = (t - last_t) / 1000;
+          last_t = t;
+
+          const PERIOD = 5;
+          const HALF_LIFE = 999999;
+          [planet_x, planet_vx] = SpringApproach(planet_x, planet_vx, PERIOD, HALF_LIFE, mouse_x, delta_t);
+          [planet_y, planet_vy] = SpringApproach(planet_y, planet_vy, PERIOD, HALF_LIFE, mouse_y, delta_t);
+          if (planet_x < 0) {
+            planet_x = -planet_x;
+            planet_vx = Math.abs(planet_vx);
+          } else if (planet_x > analytic.clientWidth) {
+            planet_x = 2 * analytic.clientWidth - planet_x;
+            planet_vx = -Math.abs(planet_vx);
+          }
+          if (planet_y < 0) {
+            planet_y = -planet_y;
+            planet_vy = Math.abs(planet_vy);
+          } else if (planet_y > analytic.clientHeight) {
+            planet_y = 2 * analytic.clientHeight - planet_y;
+            planet_vy = -Math.abs(planet_vy);
+          }
+          planet.style.top = (planet_y - planet.clientHeight / 2) + 'px';
+          planet.style.left = (planet_x - planet.clientWidth / 2) + 'px';
+          planet.style.transform = 'scale(' + LERP(0.1, 1.5, ratio(planet_y - mouse_y, -innerHeight, innerHeight)) + ')';
+
+          frameRequest = requestAnimationFrame(AnalyticFrame);
+        }
+
+        new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            frameRequest = requestAnimationFrame(AnalyticFrame);
+          } else if (frameRequest) {
+            cancelAnimationFrame(frameRequest);
+            frameRequest = null;
+          }
+        }).observe(analytic);
+
+      })();
+    </script>
+  </div>
+  <div class="slide" id="linear">
+    <h3 style="grid-column: 1 / span 8;">Linear Approach</h3>
+    <label for="linearVelocity" style="grid-column: 2 / span 6; grid-row: 3 / span 1; place-self: center start">Velocity</label>
+    <input type="range" id="linearVelocity" min="50" max="200" value="100" step="0.001" style="grid-column: 1 / span 7; grid-row: 3 / span 1; place-self: center end">
+    <canvas id="linearCanvas" width="600" height="600" style="background: rgba(255, 255, 255, 0.4); border-radius: 10px; grid-column: 1 / span 8; grid-row: 3/span 7"></canvas>
+    <script>
+      function ParametrizedLinearApproach(velocity) {
+        return function (value, dummy_v, target, delta_t) {
+          return LinearApproach(value, dummy_v, velocity, target, delta_t);
+        }
+      }
+      function RedrawLinear() {
+        document.querySelector("label[for=linearVelocity]").innerText = "Velocity: " + Math.round(linearVelocity.value) + " px/s";
+        Plot(linearCanvas, ParametrizedLinearApproach(linearVelocity.value));
+      }
+      RedrawLinear();
+      linearVelocity.addEventListener("input", RedrawLinear);
+
+      function SliderAnimator(sliders_ids, redraw_cb, approach_fn, randomize_period) {
+        this.sliders = sliders_ids.map(id => document.querySelector(id));
+        this.redraw_cb = redraw_cb;
+        this.approach_fn = approach_fn;
+        this.randomize_period = randomize_period || 5;
+        for (let slider of this.sliders) {
+          slider.targetValue = Number(slider.value);
+          slider.trueValue = Number(slider.value);
+          slider.velocity = 0;
+        }
+      }
+
+      SliderAnimator.prototype.Start = function () {
+        let RandomizeTargetValues = () => {
+          for (let slider of this.sliders) {
+            let min = Number(slider.min);
+            let max = Number(slider.max);
+            let step = Number(slider.step);
+            let r = Math.random();
+            let n_steps = Math.floor((max - min) / step);
+            let target = min + Math.floor(r * n_steps) * step;
+            slider.targetValue = target;
+          }
+        };
+        this.restInterval = setInterval(RandomizeTargetValues, this.randomize_period * 1000);
+
+        this.last_t = performance.now();
+        let AnimationFrame = (t) => {
+          let delta_t = (t - this.last_t) / 1000;
+          this.last_t = t;
+          for (let slider of this.sliders) {
+            [slider.trueValue, slider.velocity] = this.approach_fn(slider.trueValue, slider.velocity, slider.targetValue, delta_t);
+            slider.value = slider.trueValue;
+          }
+          this.redraw_cb();
+          this.animationFrame = requestAnimationFrame(AnimationFrame);
+        };
+        this.animationFrame = requestAnimationFrame(AnimationFrame);
+      };
+
+      SliderAnimator.prototype.Stop = function () {
+        if (this.restInterval) {
+          clearInterval(this.restInterval);
+          this.restInterval = null;
+        }
+        if (this.animationFrame) {
+          cancelAnimationFrame(this.animationFrame);
+          this.animationFrame = null;
+        }
+      };
+
+      function AnimateDuringIntersection(selector, animator) {
+        let observer = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting) {
+            animator.Start();
+          } else {
+            animator.Stop();
+          }
+        });
+        observer.observe(document.querySelector(selector));
+      }
+
+      function LogArgs(fn) {
+        return function () {
+          console.log(arguments);
+          return fn.apply(this, arguments);
+        }
+      }
+
+      AnimateDuringIntersection('#linear', new SliderAnimator(['#linearVelocity'], RedrawLinear, ParametrizedLinearApproach(20)));
+    </script>
+    <pre style="grid-column: 8 / span 9; grid-row: 2 / span 3;"><code class="javascript">function LinearApproach(value, velocity, target, delta_t) {
+  value -= target;
+  value = Math.max(Math.abs(value) - delta_t * velocity, 0)
+        * Math.sign(value);
+  return value + target;
+}</code></pre>
+    <span class="layer" style="color: darkgreen;grid-column: 8 / span 9; grid-row: 5;">+ colors, alpha, shadows</span>
+    <video class="layer" src="factorio.webm" loop autoplay muted style="grid-column: 8 / span 9; grid-row: 5 / span 4; place-self: stretch;"></video>
+  </div>
+  <div class="slide" id="exp">
+    <h3 style="grid-column: 1 / span 8;">Exponential Approach</h3>
+    <pre class="layer" style="grid-column: 9 / span 8; grid-row: 1 / span 3;"><code class="javascript" style=font-family:Iosevka>x = LERP(x, target, 0.1)</code></pre>
+    <span class="layer" style="grid-column: 9 / span 8; grid-row: 8;">It's everywhere in games</span>
+    <div class="layer wrap">
+      <label style="grid-column: 3 / span 7; grid-row: 3; justify-self: start" for="exponentialDecay">Decay [s]</label>
+      <input style="grid-column: 3 / span 4; grid-row: 3; justify-self: end;" type="range" id="exponentialDecay" min="0.1" max="4" value="1" step="0.001">
+      <canvas style="background: rgba(255, 255, 255, 0.4); border-radius: 10px; grid-column: 1 / span 8; grid-row: 4 / span 6" id="exponentialCanvas" width="600" height="600"></canvas>
+      <script>
+        function ParametrizedExponentialApproach(decay) {
+          return function (value, dummy_v, target, delta_t) {
+            return ExponentialApproach(value, dummy_v, decay, target, delta_t);
+          }
+        }
+        function RedrawExponential() {
+          document.querySelector("label[for=exponentialDecay]").innerText = "Half-life: " + Math.round(exponentialDecay.value * 10) / 10 + " s";
+          Plot(exponentialCanvas, ParametrizedExponentialApproach(exponentialDecay.value));
+        }
+        RedrawExponential();
+        exponentialDecay.addEventListener("input", RedrawExponential);
+        AnimateDuringIntersection('#exp', new SliderAnimator(['#exponentialDecay'], RedrawExponential, ParametrizedExponentialApproach(0.2)));
+      </script>
+    </div>
+    <pre class="layer" style="grid-column: 9 / span 8; grid-row: 3 / span 3;"><code class="javascript">function ExponentialApproach(value, half_t, target, delta_t) {
+  value -= target;
+  value *= Math.pow(0.5, -delta_t / half_t);
+  return value + target;
+}</code></pre>
+    <pre class="layer" style="grid-column: 9 / span 8; grid-row: 5 / span 3;"><code class="javascript">function ExponentialApproach(value, half_t, target, delta_t) {
+  return value
+       + (value - target) * Math.expm1(-delta_t / half_t * Math.LN2);
+}</code></pre>
+  </div>
+  <div class="slide" id="periodic">
+    <h3>Animating periodic values</h3>
+    <canvas id="periodicCanvas" width="600" height="600" style="background: rgba(255, 255, 255, 0.4); border-radius: 400px; grid-column: 1 / span 8; grid-row: 3 / span 6"></canvas><br>
+    <input type="range" id="periodicValue" min="0" max="360" value="30" step="0.001" style="grid-column: 2 / span 6; grid-row: 5 / span 2"><br>
+    <script>
+      function RedrawPeriodic() {
+        let canvas = document.getElementById('periodicCanvas');
+        let ctx = canvas.getContext('2d');
+        let slider = document.getElementById('periodicValue');
+        ctx.lineWidth = 2;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.font = '24px Voltaire';
+        ctx.textAlign = 'center';
+        ctx.beginPath();
+        let r = 225;
+        ctx.arc(0, 0, r, 0, 2 * Math.PI);
+        ctx.stroke();
+        for (let deg = 0; deg < 360; deg += 30) {
+          let rad = deg / 180 * Math.PI;
+          let sin = Math.sin(rad);
+          let cos = Math.cos(rad);
+          let x = cos * 250;
+          let y = sin * 250;
+          ctx.beginPath();
+          ctx.moveTo((r - 5) * cos, (r - 5) * sin);
+          ctx.lineTo((r + 5) * cos, (r + 5) * sin);
+          ctx.stroke();
+          ctx.fillText(deg, (r + 25) * cos, (r + 25) * sin + 8);
+        }
+        ctx.beginPath();
+        let value = Number(slider.value);
+        let target = slider.targetValue;
+        if (!Number.isFinite(target)) {
+          target = Number(slider.value);
+        }
+        while (value < target - 180) target -= 360;
+        while (value > target + 180) target += 360;
+        let target_rad = target / 180 * Math.PI;
+        ctx.arc(r * Math.cos(target_rad), r * Math.sin(target_rad), 10, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        let value_rad = value / 180 * Math.PI;
+        ctx.beginPath();
+        ctx.arc(r * Math.cos(value_rad), r * Math.sin(value_rad), 10, 0, 2 * Math.PI);
+        ctx.fill();
+
+        if (Math.abs(value - target) > 5) { // arrow
+          ctx.beginPath();
+          ctx.arc(0, 0, r - 50, value_rad, target_rad, target < value);
+          ctx.stroke();
+          ctx.save();
+          ctx.translate((r - 50) * Math.cos(target_rad), (r - 50) * Math.sin(target_rad));
+          ctx.rotate(target < value ? target_rad + Math.PI : target_rad);
+          ctx.moveTo(10, 0);
+          ctx.lineTo(0, 10);
+          ctx.lineTo(-10, 0);
+          ctx.stroke();
+          ctx.restore();
+        }
+        ctx.restore();
+      }
+
+      function ParametrizedPeriodicApproach() {
+        return function (value, v, target, delta_t) {
+          while (value < target - 180) value += 360;
+          while (value > target + 180) value -= 360;
+          [value, v] = SpringApproach(value, v, 2, 0.5, target, delta_t);
+          while (value < 0) value += 360;
+          while (value > 360) value -= 360;
+          return [value, v];
+        }
+      }
+
+      RedrawPeriodic();
+      periodicValue.addEventListener("input", RedrawPeriodic);
+      AnimateDuringIntersection('#periodic', new SliderAnimator(['#periodicValue'], RedrawPeriodic, ParametrizedPeriodicApproach(), 3));
+
+    </script>
+    <div class="wrap layer">
+      <div style="grid-column: 9 / span 8; grid-row: 3;">JavaScript</div>
+      <pre style="grid-column: 9 / span 8; grid-row: 4 / span 2; align-self: start;"><code class="javascript">while (value < target - period/2) value += period;
+while (value > target + period/2) value -= period;</code></pre>
+    </div>
+    <div class="wrap layer">
+      <div style="grid-column: 9 / span 8; grid-row: 6; align-self: end;">C++</div>
+      <pre style="grid-column: 9 / span 8; grid-row: 7 / span 2; align-self: start"><code class="cpp">value = std::remainder(value - target, range) + target;</code></pre>
+    </div>
+  </div>
+  <div class="slide">
+    <h3>Maintaining Velocity</h3>
+    <img class="layer" src="static-linear.png" style="grid-row: 3 / span 6; grid-column: 2 / span 4; place-self: stretch;">
+    <img class="layer" src="static-exp.png" style="grid-row: 3 / span 6; grid-column: 6 / span 4; place-self: stretch;">
+    <img class="layer" src="velocity-intro.webp" style="grid-row: 3 / span 6; grid-column: 10 / span 5; place-self: stretch;">
+  </div>
+  <div class="slide">
+    <h3>Sine Approach</h3>
+    <div style="grid-column: 1 / span 8; grid-row: 3 / span 2; place-self: center;">$${\cos\left( t \times 2 \pi \over \text{period} \right) + 1 \over 2} \times \text{amplitude}$$</div>
+    <img style="grid-column: 2 / span 15; grid-row: 3 / span 6; place-self: stretch;" src="cos-intro.webp">
+  </div>
+  <div class="slide" id="sine">
+    <h3 style="grid-column: 1 / span 8; grid-row: 1">Sine Approach</h3>
+    <label style="grid-column: 2 / span 6; grid-row: 2; place-self: center start;" for="sinePeriod">Period</label>
+    <input style="grid-column: 2 / span 6; grid-row: 2; place-self: center end;" type="range" id="sinePeriod" min="0.2" max="10" value="4" step="0.00001">
+    <label style="grid-column: 2 / span 6; grid-row: 3; place-self: center start;" for="sineVelocity">Initial Velocity [px/s]</label>
+    <input style="grid-column: 2 / span 6; grid-row: 3; place-self: center end;" type="range" id="sineVelocity" min="-200" max="200" value="0" step="0.00001">
+    <canvas style="background: rgba(255, 255, 255, 0.4); border-radius: 10px; grid-column: 1 / span 8; grid-row: 4 / span 6; justify-self: center;" id="sineCanvas" width="600" height="600" style="background: rgba(255, 255, 255, 0.4)"></canvas>
+    <script>
+      function ParametrizedSineApproach(period) {
+        return function (value, velocity, target, delta_t) {
+          return SineApproach(value, velocity, period, target, delta_t);
+        }
+      }
+      function RedrawSine() {
+        document.querySelector("label[for=sinePeriod]").innerText = "Period: " + Math.round(sinePeriod.value * 10) / 10 + " s";
+        document.querySelector("label[for=sineVelocity]").innerText = "Initial Velocity: " + Math.round(- sineVelocity.value) + " px/s";
+        Plot(sineCanvas, ParametrizedSineApproach(Number(sinePeriod.value)), Number(sineVelocity.value));
+      }
+      RedrawSine();
+      sinePeriod.addEventListener("input", RedrawSine);
+      sineVelocity.addEventListener("input", RedrawSine);
+      AnimateDuringIntersection('#sine', new SliderAnimator(['#sinePeriod', '#sineVelocity'], RedrawSine, ParametrizedSineApproach(2), 8));
+    </script>
+    <pre style="grid-column: 9 / span 8; grid-row: 1 / span 9"><code class="javascript">function SineApproach(value, velocity, period, target, delta_t) {
+  let P1 = 2 * Math.PI / Number(period);
+  let y = value - target;
+  let v = velocity;
+
+  let a; // a = amplitude / 2!
+  if (Math.abs(velocity) < 1e-6) {
+    a = y / 2;
+  } else {
+    a = (v * v / P1 / P1 + y * y) / y / 2;
+  }
+
+  if (Math.abs(a) > Math.abs(y)) a = y;
+
+  if (v < -Math.abs(a) * P1) {
+    v = -Math.abs(a) * P1;
+  } else if (v > Math.abs(a) * P1) {
+    v = Math.abs(a) * P1;
+  }
+  let fract = Math.abs((a * P1 + v) / (a * P1 - v));
+  let x = -2 * Math.atan(Math.sqrt(fract));
+  if (isNaN(x)) x = 0;
+  
+  if (x > Math.PI / 2) x -= Math.PI * 2;
+  x += delta_t * P1;
+  if (x > Math.PI / 2) x = Math.PI / 2;
+
+  return [a * (1 - Math.sin(x)) + target, // new value
+         -a * P1 * Math.cos(x)];          // new velocity
+}</code></pre>
+    <div class="layer" style="grid-area: 1 / 1 / span 9 / span 16; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); border-radius: 40px; padding: 20px; color: white; -webkit-text-stroke: 0px transparent;">
+      <div class="layer">Good signal of <em>heaviness</em> when period is long</div>
+      <div class="layer">Spends good amout of time near the start position</div>
+    </div>
+  </div>
+  <div class="slide">
+    <h3>Spring Approach</h3>
+    <img style="grid-area: body" src="spring-intro.webp">
+  </div>
+  <div class="slide" id="spring">
+    <h3 style="grid-column: 1 / span 5; grid-row: 1">Spring Approach</h3>
+    <label style="grid-column: 1 / span 5; grid-row: 2; place-self: center start" for="springPeriod">Period [s]</label>
+    <input style="grid-column: 1 / span 5; grid-row: 2; place-self: center end" type="range" id="springPeriod" min="0.5" max="5" value="3" step="0.001">
+    <label style="grid-column: 1 / span 5; grid-row: 3; place-self: center start" for="springHalfLife">Half-life [s]</label>
+    <input style="grid-column: 1 / span 5; grid-row: 3; place-self: center end" type="range" id="springHalfLife" min="0.1" max="5" value="1" step="0.001">
+    <label style="grid-column: 1 / span 5; grid-row: 4; place-self: center start" for="springVelocity">Initial V [px/s]</label>
+    <input style="grid-column: 1 / span 5; grid-row: 4; place-self: center end" type="range" id="springVelocity" min="-200" max="200" value="100" step="0.1">
+    <canvas style="background: rgba(255, 255, 255, 0.4); border-radius: 10px; grid-column: 1 / span 5; grid-row: 5 / span 5;" id="springCanvas" width="600" height="600"></canvas>
+    <script>
+      function ParametrizedSpringApproach(period, half_life) {
+        return function (value, velocity, target, delta_t) {
+          return SpringApproach(value, velocity, period, half_life, target, delta_t);
+        }
+      }
+
+      function RedrawSpring() {
+        document.querySelector("label[for=springHalfLife]").innerText = "Half-life: " + Math.round(springHalfLife.value * 10) / 10 + " s";
+        document.querySelector("label[for=springPeriod]").innerText = "Period: " + Math.round(springPeriod.value * 10) / 10 + " s";
+        document.querySelector("label[for=springVelocity]").innerText = "Initial V: " + -Math.round(springVelocity.value) + " px/s";
+        Plot(springCanvas, ParametrizedSpringApproach(Number(springPeriod.value), Number(springHalfLife.value)), Number(springVelocity.value));
+      }
+      RedrawSpring();
+      springPeriod.addEventListener("input", RedrawSpring);
+      springHalfLife.addEventListener("input", RedrawSpring);
+      springVelocity.addEventListener("input", RedrawSpring);
+      AnimateDuringIntersection('#spring', new SliderAnimator(['#springPeriod', '#springHalfLife', '#springVelocity'], RedrawSpring, ParametrizedSpringApproach(1, 0.5), 8));
+    </script>
+    <pre style="grid-column: 6 / span 11; grid-row: 1 / span 9;"><code class="javascript">function SpringApproach(value, velocity, period, half_life, target, delta_t) {
+  let P1 = 2 * Math.PI / period;
+  let P2 = -1 / Math.LOG2E / half_life;
+  let y = value - target; // y = a * cos(t * P1) * exp(t * P2)
+  let v = velocity;       // v = a * exp(t * P2) * (P2 * cos(t * P1) - P1 * sin(t * P1))
+
+  let arg = P1 * y / Math.sqrt(P1 * P1 * y * y + P2 * P2 * y * y - 2 * P2 * v * y + v * v);
+  if (isNaN(arg)) {
+    return [target, 0];
+  }
+
+  let ts = [-Math.acos(-arg) / P1, Math.acos(-arg) / P1, Math.acos(arg) / P1, -Math.acos(arg) / P1];
+
+  let best_t, best_a;
+  let best_t_err = Infinity;
+  for (let t of ts) {
+    let a = y / Math.cos(t * P1) / Math.exp(t * P2);
+    let new_v = a * Math.exp(t * P2) * (P2 * Math.cos(P1 * t) - P1 * Math.sin(P1 * t));
+    let err = Math.abs(velocity - new_v);
+    if (err < best_t_err) {
+      best_t = t;
+      best_a = a;
+      best_t_err = err;
+    }
+  }
+
+  let t = best_t + delta_t;
+  let a = best_a;
+  return [a * Math.exp(t * P2) * Math.cos(t * P1) + target,                        // new value
+          a * Math.exp(t * P2) * (P2 * Math.cos(P1 * t) - P1 * Math.sin(P1 * t))]; // new velocity
+}</code></pre>
+    <table class="layer" style="grid-area: 1 / 1 / span 9 / span 16; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); border-radius: 40px; padding: 20px; color: white; -webkit-text-stroke: 0px transparent;">
+      <tr>
+        <td style="padding: 10px; font-style: italic; color: #ccc">Approach:</td>
+        <td style="padding: 10px; font-weight: bold;">Analytic</td>
+        <td style="padding: 10px; font-weight: bold;">Simulation</td>
+      </tr>
+      <tr class="layer">
+        <td style="padding: 10px; font-style: italic; color: #ccc">Code bloat:</td>
+        <td style="padding: 10px">A function</td>
+        <td style="padding: 10px">A library (physics engine)</td>
+      </tr>
+      <tr class="layer">
+        <td style="padding: 10px; font-style: italic; color: #ccc">Parameters:</td>
+        <td style="padding: 10px">Period, Half-time</td>
+        <td style="padding: 10px">Spring constant, Mass, Damping</td>
+      </tr>
+      <tr class="layer">
+        <td style="padding: 10px; font-style: italic; color: #ccc">State:</td>
+        <td style="padding: 10px">Value, Velocity</td>
+        <td style="padding: 10px">Whole physics engine</td>
+      </tr>
+      <tr class="layer">
+        <td style="padding: 10px; font-style: italic; color: #ccc">Accuracy:</td>
+        <td style="padding: 10px">Excellent</td>
+        <td style="padding: 10px">Tick-rate dependent</td>
+      </tr>
+    </table>
+  </div>
+  <div class="slide" id="train">
+    <h3>Moving objects can't be sharp</h3>
+    <img src="train.webp" style="grid-column: 3 / span 14; grid-row: 3 / span 4; place-self: stretch">
+    <img class="layer" src="warp-intro.webp" style="grid-column: 1 / span 6; grid-row: 6 / span 4; place-self: stretch">
+    <a href="https://www.flickr.com/photos/kirberich/3510952537" class="footnote">https://www.flickr.com/photos/kirberich/3510952537</a>
+  </div>
+  <div class="slide" id="warp">
+    <h3 style="grid-column: 1 / span 8">Warp Approach</h3>
+    <label style="grid-column: 2 / span 5; grid-row: 3; place-self: center start" for="warpTime">Warp time [s]</label>
+    <input style="grid-column: 2 / span 5; grid-row: 3; place-self: center end" type="range" id="warpTime" min="2" max="20" value="10" step="0.01">
+    <label style="grid-column: 2 / span 5; grid-row: 4; place-self: center start" for="warpDist">Warp dist [px]</label>
+    <input style="grid-column: 2 / span 5; grid-row: 4; place-self: center end" type="range" id="warpDist" min="1" max="200" value="100" step="0.01">
+    <label style="grid-column: 2 / span 5; grid-row: 5; place-self: center start" for="warpVelocity">Initial V [px/s]</label>
+    <input style="grid-column: 2 / span 5; grid-row: 5; place-self: center end" type="range" id="warpVelocity" min="-100" max="100" value="0" step="0.01">
+    <canvas style="background: rgba(255, 255, 255, 0.4); border-radius: 10px; grid-column: 1 / span 7; grid-row: 6 / span 4" id="warpCanvas" width="600" height="600"></canvas>
+    <script>
+      function ParametrizedWarpApproach(warp_time, warp_dist) {
+        return function (value, velocity, target, delta_t) {
+          return WarpApproach(value, velocity, warp_time, warp_dist, target, delta_t);
+        }
+      }
+
+      function RedrawWarp() {
+        document.querySelector("label[for=warpDist]").innerText = "Warp dist: " + Math.round(warpDist.value) + " px";
+        document.querySelector("label[for=warpTime]").innerText = "Warp time: " + Math.round(warpTime.value) / 10 + " s";
+        document.querySelector("label[for=warpVelocity]").innerText = "Initial V: " + Math.round(warpVelocity.value) + " px/s";
+        Plot(warpCanvas, ParametrizedWarpApproach(Number(warpTime.value) / 10, Number(warpDist.value)), Number(warpVelocity.value));
+      }
+      RedrawWarp();
+      warpTime.addEventListener("input", RedrawWarp);
+      warpDist.addEventListener("input", RedrawWarp);
+      warpVelocity.addEventListener("input", RedrawWarp);
+      AnimateDuringIntersection('#warp', new SliderAnimator(['#warpTime', '#warpDist', '#warpVelocity'], RedrawWarp, ParametrizedWarpApproach(2, 20), 8));
+    </script>
+    <pre style="grid-column: 8 / span 9; grid-row: 1 / span 9;"><code class="javascript">function WarpApproach(value, velocity, warp_time, warp_dist, target, delta_t) {
+  let y = (value - target) / warp_dist;
+  let v = velocity * warp_time / warp_dist;
+  let angle = Math.atan(v);
+
+  let a_sign = y <= 0 ? 1 : -1;
+  let a_x = Math.cos(angle + Math.PI / 2 * a_sign);
+  let a_y = y + Math.sin(angle + Math.PI / 2 * a_sign);
+
+  let b_x, b_y = -a_sign;
+  if (a_x < 0 && Math.abs(b_y - y) <= 1 && Math.abs(y) < Math.abs(a_y + b_y) / 2) {
+    b_x = Math.sqrt(1 - (b_y - y) * (b_y - y)); // B tangent to current position
+  } else if (Math.abs(a_y) < 1) {               // B tangent to A
+    b_x = a_x + Math.sqrt(4 - (b_y - a_y) * (b_y - a_y));
+  } else {                                      // B on the right side of A
+    b_x = a_x + 2;
+  }
+
+  let x = delta_t / warp_time, y_result, dir = 0;
+  if (x >= b_x) {
+    return [target, 0];
+  } else if (x < (a_x + b_x) / 2) {
+    let alpha = Math.acos(x - a_x);
+    dir = 1 / Math.tan(alpha) * a_sign * warp_dist / warp_time;
+    y_result = -a_sign * Math.sin(alpha) + a_y;
+  } else {
+    let alpha = Math.acos(x - b_x);
+    dir = -1 / Math.tan(alpha) * a_sign * warp_dist / warp_time;
+    y_result = a_sign * Math.sin(alpha) + b_y;
+  }
+
+  return [y_result * warp_dist + target, dir];
+}</code></pre>
+  </div>
+  <div class="slide" id="drag">
+    <h3>Responsive Dragging</h3>
+    <pre style="grid-column: 1 / span 16; grid-row: 3 / span 2"><code class="javascript">
+    function AnimationFrame(t) {
+      ...
+      [screenX, velocityX] = SpringApproach(screenX, velocityX, 0.4, 0.2, /* targetX */ mouseX, delta_t);
+      [screenY, velocityY] = SpringApproach(screenY, velocityY, 0.4, 0.2, /* targetY */ mouseY, delta_t);
+      ...
+    }</code></pre>
+    <div class="layer" style="grid-column: 1 / span 16; grid-row: 5">Solution: shift the screen position by mouse movement.</div>
+    <pre class="layer" style="grid-column: 1 / span 16; grid-row: 6 / span 2"><code class="javascript">
+    onmousemove = function(event) {
+      ...
+      screenX += event.movementX;
+      screenY += event.movementY;
+      ...
+    }</code></pre>
+    <div class="layer" style="grid-column: 1 / span 16; grid-row: 8">Except...</div>
+    <img src="planet.webp" style="position:absolute; height: 200px; top:calc(50vh - 100px)">
+    <script>
+      (function () {
+        let drag_slide = document.getElementById('drag');
+        let planet = drag_slide.querySelector('img[src="planet.webp"]');
+        planet.ax = 0;
+        planet.vx = 0;
+        planet.ay = 0;
+        planet.vy = 0;
+        let target_x = innerWidth / 2, target_y = innerHeight / 2, mouse_down = false;
+
+        drag_slide.addEventListener('mousedown', function (event) {
+          mouse_down = true;
+          target_x = event.clientX;
+          target_y = event.clientY;
+          event.preventDefault();
+          return false;
+        }, true);
+
+        drag_slide.addEventListener('mousemove', function (event) {
+          if (!mouse_down) {
+            return;
+          }
+          target_x = event.clientX;
+          target_y = event.clientY;
+          event.preventDefault();
+          return false;
+        }, true);
+
+        drag_slide.addEventListener('mouseup', function () {
+          mouse_down = false;
+          event.preventDefault();
+          return false;
+        }, true);
+
+        new IntersectionObserver((entries) => {
+          let intersecting = entries[0].isIntersecting;
+          if (intersecting) {
+            let last_t = performance.now();
+            let AnimationFrame = function (t) {
+              let delta_t = (t - last_t) / 1000;
+              last_t = t;
+              if (intersecting) {
+                requestAnimationFrame(AnimationFrame);
+              }
+              [planet.ax, planet.vx] = SpringApproach(planet.ax, planet.vx, 0.4, 0.2, target_x, delta_t);
+              [planet.ay, planet.vy] = SpringApproach(planet.ay, planet.vy, 0.4, 0.2, target_y, delta_t);
+              planet.style.left = (planet.ax - planet.clientWidth / 2) + 'px';
+              planet.style.top = (planet.ay - planet.clientHeight / 2) + 'px';
+            };
+            requestAnimationFrame(AnimationFrame);
+          }
+        }).observe(drag_slide);
+      })();
+    </script>
+  </div>
+  <div class="slide" id="snap">
+    <img src="target.svg" style="position: absolute; top: 20px; left: 20px; width: 200px; height: 200px;">
+    <img src="target.svg" style="position: absolute; top: 20px; right: 20px; width: 200px; height: 200px;">
+    <img src="target.svg" style="position: absolute; bottom: 20px; left: 20px; width: 200px; height: 200px;">
+    <img src="target.svg" style="position: absolute; bottom: 20px; right: 20px; width: 200px; height: 200px;">
+    <h3>Responsive Snapping</h3>
+    <pre class="layer" style="grid-column: 1 / span 16; grid-row: 3"><code class=" javascript">let Snap = function (x, y): [number, number] { ... }</code></pre>
+
+    <div class="wrap layer">
+      <div style="grid-column: 1 / span 16; grid-row: 4">Solution: if mouse position snaps to the same point - don't move the object:</div>
+      <div style="grid-column: 1 / span 16; grid-row: 5"><input type="checkbox" id="snapResponsive" style="zoom: 2">Responsive snapping</div>
+      <pre style="grid-column: 1 / span 16; grid-row: 6 / span 4; align-self: start;" id="snapSample"><code class="javascript">
+    onmousemove = function(event) {
+      ...
+      [targetX, targetY] = Snap(event.clientX, event.clientY);
+      if (targetX != lastX || targetY != lastY) {
+        screenX += event.movementX;
+        screenY += event.movementY;
+      }
+      [lastX, lastY] = [targetX, targetY];
+      ...
+    }</code></pre>
+    </div>
+    <img src="planet.webp" style="position:absolute; height: 200px; pointer-events: none;">
+    <script>
+      (function () {
+        let snap_slide = document.getElementById('snap');
+        let planet = snap_slide.querySelector('img[src="planet.webp"]');
+        let check = document.getElementById('snapResponsive');
+        planet.ax = 0;
+        planet.vx = 0;
+        planet.ay = 0;
+        planet.vy = 0;
+        let last_target_x = innerWidth / 2,
+          last_target_y = innerHeight / 2,
+          target_x = 120,
+          target_y = 120,
+          mouse_down = false;
+
+        let Snap = function (x, y) {
+          let snap_positions = [
+            [120, 120],
+            [innerWidth - 120, 120],
+            [120, innerHeight - 120],
+            [innerWidth - 120, innerHeight - 120]
+          ];
+          for (let [sx, sy] of snap_positions) {
+            if (Math.hypot(x - sx, y - sy) < 200) {
+              return [sx, sy];
+            }
+          }
+          return [x, y];
+        }
+
+        let UpdateBlur = function () {
+          if (check.checked) {
+            document.getElementById('snapSample').style.filter = 'blur(0)';
+          } else {
+            document.getElementById('snapSample').style.filter = 'blur(2px)';
+          }
+        };
+        check.addEventListener('change', UpdateBlur);
+        UpdateBlur();
+
+        snap_slide.addEventListener('mousedown', function (event) {
+          if (event.target == check) {
+            return true;
+          }
+          mouse_down = true;
+          [target_x, target_y] = Snap(event.clientX, event.clientY);
+          [last_target_x, last_target_y] = [target_x, target_y];
+          event.preventDefault();
+          return false;
+        }, true);
+
+        snap_slide.addEventListener('mousemove', function (event) {
+          if (!mouse_down) {
+            return;
+          }
+
+          [target_x, target_y] = Snap(event.clientX, event.clientY);
+          if ((target_x != last_target_x || target_y != last_target_y) && check.checked) {
+            planet.ax += event.movementX;
+            planet.ay += event.movementY;
+          }
+          [last_target_x, last_target_y] = [target_x, target_y];
+
+          event.preventDefault();
+          return false;
+        }, true);
+
+        snap_slide.addEventListener('mouseup', function () {
+          mouse_down = false;
+          event.preventDefault();
+          return false;
+        }, true);
+
+        let intersecting = false;
+        new IntersectionObserver((entries) => {
+          intersecting = entries[0].isIntersecting;
+          if (intersecting) {
+            let last_t = performance.now();
+            let AnimationFrame = function (t) {
+              let delta_t = (t - last_t) / 1000;
+              last_t = t;
+              if (intersecting) {
+                requestAnimationFrame(AnimationFrame);
+              }
+              [planet.ax, planet.vx] = SpringApproach(planet.ax, planet.vx, 0.4, 0.2, target_x, delta_t);
+              [planet.ay, planet.vy] = SpringApproach(planet.ay, planet.vy, 0.4, 0.2, target_y, delta_t);
+              planet.style.left = (planet.ax - planet.clientWidth / 2) + 'px';
+              planet.style.top = (planet.ay - planet.clientHeight / 2) + 'px';
+            };
+            requestAnimationFrame(AnimationFrame);
+          }
+        }).observe(snap_slide);
+      })();
+    </script>
+  </div>
+  <div class="slide" id="reparent">
+    <h3 style="grid-column: 1 / span 8;">Reparenting Widgets</h3>
+    <div style="grid-column: 1 / span 8; grid-row: 3">Moving a widget from \(\mathbf{A}\) to \(\mathbf{B}\):</div>
+    <ol class="layer" style="grid-column: 1 / span 8; grid-row: 4 / span 3">
+      <li>Find initial transform \(\mathbf{A}\)</li>
+      <li>Reparent widget</li>
+      <li>Find new transform \(\mathbf{B}\)</li>
+      <li>Offset the widget by \(-\mathbf{B} + \mathbf{A}\)</li>
+      <li>Animate offset \(\rightarrow 0\)</li>
+    </ol>
+    <img class="layer" src="reparent.svg" style="grid-column: 1 / span 8; grid-row: 7 / span 3; place-self: stretch;">
+    <pre class="layer" style="grid-column: 9 / span 8; grid-row: 1 / span 4"><code class="javascript">div.addEventListener('mouseenter', function (e) {
+  let A = star.getBoundingClientRect();
+  e.target.appendChild(star);
+  let B = star.getBoundingClientRect();
+  star.offsetX += A.left - B.left;
+  star.offsetY += A.top - B.top;
+});</code></pre>
+    <style scoped>
+      #reparent .box {
+        border-radius: 15px;
+        display: flex;
+        border-style: solid;
+        border-width: 2px;
+        gap: 15px;
+        padding: 15px;
+        flex-wrap: wrap;
+      }
+
+      #reparent .leaf.box {
+        min-height: 100px;
+        flex-basis: 0;
+        flex-grow: 1;
+      }
+
+      #reparent .leaf:hover {
+        filter: brightness(1.2);
+        cursor: pointer;
+      }
+    </style>
+    <div class="box" style="grid-column: 9 / span 8; grid-row: 5 / span 4; border-color: #550000; background-color: #ffaaaa; width: 450px; height: 400px; align-content: stretch; position: relative;">
+      <div class="box" style="flex-basis: 100%; border-color: #552200; background-color: #ffb380;">
+        <div class="box leaf" style="border-color: #502d16; background-color: #e9c6af;"></div>
+        <div class="box leaf" style="border-color: #6c5d53; background-color: #c8beb7;"></div>
+      </div>
+      <div class="box leaf" style="border-color: #554400; background-color: #ffe680;"><img src="star_outline.svg" style="position: absolute; width:100px; height: 100px"><img src="star.svg" style="position: relative; width:100px; height: 100px"></div>
+      <div class="box leaf" style="border-color: #504416; background-color: #decd87;"></div>
+      <div class="box leaf" style="border-color: #445500; background-color: #eeffaa;"></div>
+    </div>
+    <script>
+      (function () {
+        let outline = document.querySelector('#reparent img[src="star_outline.svg"]');
+        let star = document.querySelector('#reparent img[src="star.svg"]');
+        star.offsetX = 0;
+        star.offsetY = 0;
+        star.velocityX = 0;
+        star.velocityY = 0;
+        let divs = document.querySelectorAll('#reparent div.leaf');
+        for (let div of divs) {
+          div.addEventListener('mouseenter', function (e) {
+            let A = star.getBoundingClientRect();
+            e.target.appendChild(outline);
+            e.target.appendChild(star);
+            let B = star.getBoundingClientRect();
+            star.offsetX += A.left - B.left;
+            star.offsetY += A.top - B.top;
+          });
+        }
+        let intersecting = false;
+
+        new IntersectionObserver((entries) => {
+          intersecting = entries[0].isIntersecting;
+          if (intersecting) {
+            let last_t = performance.now();
+            let AnimationFrame = function (t) {
+              let delta_t = (t - last_t) / 1000;
+              last_t = t;
+              if (intersecting) {
+                requestAnimationFrame(AnimationFrame);
+              }
+              [star.offsetX, star.velocityX] = SpringApproach(star.offsetX, star.velocityX, 1, 0.3, 0, delta_t);
+              [star.offsetY, star.velocityY] = SpringApproach(star.offsetY, star.velocityY, 1, 0.3, 0, delta_t);
+              star.style.left = (star.offsetX) + 'px';
+              star.style.top = (star.offsetY) + 'px';
+            };
+            requestAnimationFrame(AnimationFrame);
+          }
+        }).observe(document.getElementById('reparent'));
+      })();
+    </script>
+  </div>
+  <div class="slide">
+    <h3>Reparenting With Matricies</h3>
+    <div class="layer" style="grid-column: 1 / span 10; grid-row: 3 / span 2">$$\mathbf{CTM} = \begin{bmatrix}
+      \text{scaleX} & \text{skewX} & \text{translateX}\\
+      \text{skewY} & \text{scaleY} & \text{translateY}\\
+      0 & 0 & 1
+      \end{bmatrix}$$</div>
+    <div class="layer" style="grid-column: 1 / span 10; grid-row: 5 / span 2;">$$\overrightarrow{\mathbf{screen}} = \mathbf{CTM} \times \begin{bmatrix} \text{localX} \\ \text{localY} \\ 1 \end{bmatrix}$$</div>
+    <video class="layer" style="grid-column: 11 / span 5; grid-row: 3/span 4; place-self: stretch" src="automat-reparent.webm" loop autoplay muted></video>
+    <div class="layer" style="grid-column: 1 / span 16; grid-row: 7;">Matrix support in JavaScript: 🫥</div>
+    <pre class="layer" style="grid-column: 1 / span 16; grid-row: 8;"><code class="javascript">getComputedStyle(elem).transform</code></pre>
+    <div class="layer" style="grid-column: 1 / span 16; grid-row: 9;"><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block">MDN web docs: Layout and the containing block</a></div>
+  </div>
+  <div class="slide">
+    <h3>Avoiding Power Draw</h3>
+    <div class="layer" style="grid-column: 7 / span 8; grid-row: 4 / span 2; text-align: left;">Stop the animation when there is nothing to animate.</div>
+    <pre class="layer" style="grid-column: 1 / span 8; grid-row: 3 / span 6;"><code class="javascript">var needsAnimationFrame;
+var animating = false;
+function Frame(t) {
+  <b>needsAnimationFrame</b> = false;
+  ...
+  if (needsAnimationFrame) {
+    requestAnimationFrame(Frame);
+  } else {
+    animating = false;
+  }
+}
+function StartAnimation() {
+  if (!animating) {
+    requestAnimationFrame(Frame);
+    animating = true;
+  }
+}</code></pre>
+    <div class="layer" style="grid-column: 7 / span 8; grid-row: 6 / span 2; text-align: left;">Only call <code>requestAnimationFrame</code> if <code>needsAnimationFrame</code> was set during the frame.</div>
+  </div>
+  <div class="slide">
+    <h3 style="grid-column: 1 / span 8;">Tearing Can Be Awesome</h3>
+    <video style="grid-column: 9 / span 8; grid-row: 1 / span 5; place-self: stretch;" src="tearing.webm" loop autoplay muted></video>
+    <img class="layer" src="deadspace.webp" style="grid-column: 9 / span 8; grid-row: 6 / span 4; place-self: stretch">
+    <div class="layer" style="grid-column: 1 / span 8; grid-row: 4;">Latency &darr; by 1/2 frame</div>
+    <div class="layer" style="grid-column: 1 / span 8; grid-row: 5;">Barely noticeable</div>
+    <div class="layer" style="grid-column: 1 / span 8; grid-row: 6;">HTML support: 😶‍🌫️</div>
+  </div>
+  <div class="slide">
+    <h3>End-to-end latency is lower for sound!</h3>
+    <a class="layer" style="display: inline-block; grid-column: 1 / span 16; grid-row: 4 / span 6;" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4456887/"><img src="sound.webp"></a>
+    <div class="layer" style="grid-column: 1 / span 16; grid-row: 3;">Use the right OS APIs: WASAPI on Windows / PipeWire on Linux</div>
+  </div>
+  <div class="slide" id="end">
+    <h3 style="grid-column: 1 / span 7; grid-row: 1 / span 9">Thank you :)</h3>
+    <img style="grid-area: 1 / 8 / span 9 / span 9; place-self: stretch;" src="qrcode.svg">
+    <a style="grid-column: 1 / span 7; grid-row: 9" href="https://mrogalski.eu">https://mrogalski.eu</a>
+  </div>
+
+  <nav>
+    <button onclick="PrevSlide()">&larr;</button><button onclick="NextSlide()">&rarr;</button>
+  </nav>
+
+  <script src="slides.js"></script>
+
+  <script src="highlight/highlight.min.js"></script>
+  <script>
+    hljs.highlightAll();
+  </script>
+  <script id="MathJax-script" async src="mathjax/tex-mml-chtml.js"></script>
+
+</body>
+
+</html>

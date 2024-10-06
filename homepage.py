@@ -54,6 +54,7 @@ def render_nav():
         <li><a href="https://github.com/mafik/">GitHub: @mafik</a></li>
         <li><a href="https://szmer.info/u/maf">Lemmy: @maf@szmer.info</a></li>
         <li><a href="https://101010.pl/@maf" rel="me">Mastodon: @maf@101010.pl</a></li>
+        <li><a href="https://bsky.app/profile/mrogalski.eu" rel="me">Bluesky: @mrogalski.eu</a></li>
         <li><a href="https://twitter.com/mafikpl">Twitter: @mafikpl</a></li>
       </ul>
     </nav>'''
@@ -62,12 +63,10 @@ def render_body(body_class, content=''):
     nav = render_nav()
     return f'''<body class="{body_class}">{nav}{content}<script src="/i18n.js"></script></body>'''
 
-def render_layout(body, title_en=TITLE_EN, desc_en=DESC_EN, thumb=URL + '/snail.jpg', date='', microdata_type='Blog'):
+def render_layout(body, title_en=TITLE_EN, desc_en=DESC_EN, thumb=URL + '/snail.jpg', date='', microdata_type='Blog', head_extra=''):
     if date:
-        meta_extra = f'<meta itemprop="dateCreated" content="{date}">' + \
+        head_extra += f'<meta itemprop="dateCreated" content="{date}">' + \
                      f'<meta itemprop="datePublished" content="{date}">'
-    else:
-        meta_extra = ''
 
     return f'''<!DOCTYPE html>
 <html itemscope itemtype="http://schema.org/{microdata_type}">
@@ -79,7 +78,7 @@ def render_layout(body, title_en=TITLE_EN, desc_en=DESC_EN, thumb=URL + '/snail.
     <meta itemprop="description" content="{desc_en}">
     <meta name="description" content="{desc_en}">
     <meta itemprop="image" content="{thumb}">
-    {meta_extra}
+    {head_extra}
     <link rel="shortcut icon" href="/favicon.ico">
     <title>{title_en}</title>
     <link rel="alternate" href="https://mrogalski.eu/feed.xml" type="application/rss+xml" title="RSS">
@@ -96,12 +95,13 @@ def render_index(page):
 
 def render_article(page):
     body = render_body('article', f'<article>{page.article_html}</article>')
-    return render_layout(body, page.title_en, page.desc_en, page.thumb, page.date, 'Article')
+    return render_layout(body, page.title_en, page.desc_en, page.thumb, page.date, 'Article', page.head)
 
 def format_path(path, filename):
     return ('/' + path if path else '') + '/' + filename
 
-class Page: pass
+class Page:
+    head = ''
 
 class Feed(Page):
     path = ''
@@ -112,6 +112,8 @@ class Feed(Page):
         items = ''
         for article in articles:
             permalink = URL + article.url
+            while '/' in permalink and not permalink.endswith('/'):
+                permalink = permalink[:-1]
             items += f'''<item>
         <title>{article.title_en}</title>
         <link>{permalink}</link>
@@ -150,6 +152,7 @@ def build():
             contents_path = 'contents' + format_path(path, filename)
             is_md = filename.endswith('.md')
             is_hidden = filename.startswith('.')
+            print(filename)
             if is_hidden:
                 continue
             elif is_md:
@@ -168,12 +171,16 @@ def build():
                     page.rfc822date = email.utils.formatdate(time_epoch, localtime=True)
                 page.path = path
                 page.url = format_path(path, page.filename if page.filename != 'index.html' else '')
-                page.render = functools.partial(globals()[page.renderer], page)
-                pages.append(page)
-            else:
-                build_path = 'build' + format_path(path, filename)
-                print(contents_path, "->", build_path)
-                os.link(contents_path, build_path)
+                if hasattr(page, 'renderer'):
+                    page.render = functools.partial(globals()[page.renderer], page)
+                    pages.append(page)
+                    continue
+                else:
+                    pass # fallback to simple file copy
+            
+            build_path = 'build' + format_path(path, filename)
+            print(contents_path, "->", build_path)
+            os.link(contents_path, build_path)
 
     print("Rendering pages...")
 

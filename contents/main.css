@@ -348,4 +348,9 @@ body.index {
   table th {
     border-color: #3a3a3a;
   }
+
+  body.index nav ul.articles li {
+    background: linear-gradient(0deg, #270d0d, #4b0f0f);
+    border: 3px outset #851c10;
+  }
 }

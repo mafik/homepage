@@ -73,6 +73,9 @@ function ScrollTo(slide, fromMouse) {
   }
   slide.scrollIntoView({ behavior: 'smooth' });
   history.replaceState(null, null, '#' + slide.id);
+  if (!IsPresentationMode()) {
+    RevealAllLayers(slide);
+  }
 }
 
 function ArrowRight() {
@@ -95,29 +98,42 @@ function ArrowLeft() {
   ScrollTo(PrevSlide());
 }
 
+function RevealAllLayers(elem) {
+  let hiddenLayers = elem.querySelectorAll('.layer:not(.shown');
+  for (let layer of hiddenLayers) {
+    layer.classList.add('shown');
+  }
+}
+
+let presentationModeCheck = document.getElementById('presentationMode');
+presentationModeCheck.addEventListener('change', (e) => {
+  localStorage.setItem('presentationMode', presentationModeCheck.checked);
+});
+presentationModeCheck.checked = localStorage.getItem('presentationMode') === 'true';
+
+function IsPresentationMode() {
+  return presentationModeCheck.checked;
+}
+
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowRight') {
-    ArrowRight();
-  } else if (e.key === 'ArrowLeft') {
-    ArrowLeft();
-  } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
-    ScrollTo(PrevSlide());
-  } else if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
-    let current = CurrentSlide();
-    let hiddenLayers = current.querySelectorAll('.layer:not(.shown');
-    // show all hidden layers
-    for (let layer of hiddenLayers) {
-      layer.classList.add('shown');
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ' || e.key === 'ArrowDown') {
+    if (IsPresentationMode()) {
+      ArrowRight();
+    } else {
+      ScrollTo(NextSlide());
+      RevealAllLayers(CurrentSlide());
     }
-    ScrollTo(NextSlide());
+  } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'ArrowUp') {
+    if (IsPresentationMode()) {
+      ArrowLeft();
+    } else {
+      ScrollTo(PrevSlide());
+      RevealAllLayers(CurrentSlide());
+    }
   } else if (e.key === 'Home') {
     ScrollTo(slides[0]);
   } else if (e.key === 'End') {
-    let hiddenLayers = document.body.querySelectorAll('.layer:not(.shown');
-    // show all hidden layers
-    for (let layer of hiddenLayers) {
-      layer.classList.add('shown');
-    }
+    RevealAllLayers(document.body);
     ScrollTo(slides[slides.length - 1]);
   } else {
     return true;

@@ -70,11 +70,3 @@ date: 2014-04-19
 <p lang=en><strong class=bad>Bytecode lock-in</strong> - bytecode choosen as the standard would be very hard to change.</p>
 
 <p lang=pl><strong class=bad>Związanie z bajtkodem</strong> - bajtkod wybrany jako część standardu byłby bardzo ciężki do zmiany.</p>
-
-<h2 lang=pl>Dość teoretyzowania</h2>
-
-<h2 lang=en>Enough teorizing</h2>
-
-<p lang=en>Executable image format is a realistic and achievable goal. If you want to make it happen and you are looking for help of expierienced programmer, <a href=mailto:mafikpl@gmail.com>send me an email</a> - maybe we could help each other.</p>
-
-<p lang=pl>Obrazy wykonywalne to cel jak najbardziej osiągalny. Jeśli chcesz zrealizować ich ideę i szukasz pomocy doświadczonego programisty, <a href=mailto:mafikpl@gmail.com>napisz do mnie</a> - być może będziemy mogli sobie pomóc.</p>
